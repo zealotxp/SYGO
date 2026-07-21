@@ -48,8 +48,8 @@ for (file, src, title, page, hasTab, tabActive, modals, leaflet, extra) in PAGES
     block = PAGE(src)
     # strip own-line HTML comments (next-page boundary comments etc.)
     block = re.sub(r'^\s*<!--.*-->\s*$', '', block, flags=re.M)
-    # ensure single page div is active
-    block = re.sub(r'class="page"', 'class="page active"', block)
+    # ensure the root page div is visible (add 'active' to its class, whatever the class is)
+    block = re.sub(r'<div class="([^"]*)"', lambda m: '<div class="%s"' % (m.group(1) + ' active' if 'active' not in m.group(1) else m.group(1)), block, count=1)
     if extra:
         block = block.replace(extra[0], extra[1])
     modal_html = '\n'.join(MOD(m) for m in modals)

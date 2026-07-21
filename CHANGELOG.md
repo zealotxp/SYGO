@@ -1,5 +1,8 @@
 # 更新记录
 
+## [1.2.2] - 2026-07-21
+- 修复搜索页白屏：assemble 给根 div 补 active 类（search-results-page 无 page 类导致未加 active）
+
 ## [1.2.1] - 2026-07-21
 - 修复白屏：去除误注入的未闭合 login-page 遮罩，登录页改为 display:block
 
