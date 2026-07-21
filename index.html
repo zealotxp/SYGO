@@ -642,6 +642,9 @@
     color: var(--text-secondary);
     line-height: 1.8;
   }
+  .drug-info-content p { margin: 0 0 10px; }
+  .drug-info-content p:last-child { margin-bottom: 0; }
+  .drug-info-content p b { color: var(--text); font-weight: 600; }
 
   /* ===== Nearby Merchant List ===== */
   .nearby-merchant-section {
@@ -2335,23 +2338,8 @@
     </div>
 
     <div class="drug-info-section">
-      <div class="drug-info-title">适应症</div>
-      <div class="drug-info-content">1. 原发性免疫球蛋白缺乏症，如X联锁低免疫球蛋白血症，常见变异性免疫缺陷病，免疫球蛋白G亚型缺陷病等。<br>2. 继发性免疫球蛋白缺陷病，如重症感染，新生儿败血症等。<br>3. 自身免疫性疾病，如原发性血小板减少性紫癜，川崎病等。</div>
-    </div>
-
-    <div class="drug-info-section">
-      <div class="drug-info-title">用法用量</div>
-      <div class="drug-info-content">静脉滴注或以5%葡萄糖溶液稀释后静脉滴注。开始滴注速度为1.0ml/分钟（约20滴/分钟），持续15分钟后若无不良反应，可逐渐加快速度。最快滴注速度不得超过3.0ml/分钟（约60滴/分钟）。</div>
-    </div>
-
-    <div class="drug-info-section">
-      <div class="drug-info-title">禁忌</div>
-      <div class="drug-info-content">1. 对人免疫球蛋白过敏或有其他严重过敏史者。<br>2. 有抗IgA抗体的选择性IgA缺乏者。<br>3. 本品仅供静脉输注用。</div>
-    </div>
-
-    <div class="drug-info-section">
-      <div class="drug-info-title">注意事项</div>
-      <div class="drug-info-content">1. 本品专供静脉输注，应在有抢救条件的医疗机构使用。<br>2. 本品呈现混浊、沉淀、异物或瓶身有裂纹、过期失效等情况不得使用。<br>3. 开瓶后应一次用完，未用完部分应废弃。<br>4. 运输及贮存过程中严禁冻结。</div>
+      <div class="drug-info-title">药品介绍</div>
+      <div class="drug-info-content" id="drugDetailIntro"></div>
     </div>
 
     <!-- Nearby Merchants with this drug -->
@@ -3608,12 +3596,14 @@ function goDrugDetail(id) {
   document.getElementById('drugDetailSpec').textContent = drug.spec;
   document.getElementById('drugDetailSpec2').textContent = drug.spec2;
 
-  // Update info sections
-  const infoSections = document.querySelectorAll('#drugDetailPage .drug-info-section');
-  if (infoSections[0]) infoSections[0].querySelector('.drug-info-content').innerHTML = drug.indications;
-  if (infoSections[1]) infoSections[1].querySelector('.drug-info-content').innerHTML = drug.usage;
-  if (infoSections[2]) infoSections[2].querySelector('.drug-info-content').innerHTML = drug.contraindications;
-  if (infoSections[3]) infoSections[3].querySelector('.drug-info-content').innerHTML = drug.precautions;
+  // Update info section: 合并为单个「药品介绍」富文本
+  let introHtml = '';
+  if (drug.indications) introHtml += '<p><b>适应症：</b>' + drug.indications + '</p>';
+  if (drug.usage) introHtml += '<p><b>用法用量：</b>' + drug.usage + '</p>';
+  if (drug.contraindications) introHtml += '<p><b>禁忌：</b>' + drug.contraindications + '</p>';
+  if (drug.precautions) introHtml += '<p><b>注意事项：</b>' + drug.precautions + '</p>';
+  const introEl = document.getElementById('drugDetailIntro');
+  if (introEl) introEl.innerHTML = introHtml || '<p>暂无介绍</p>';
 
   // Update nearby merchants section
   const nearbySection = document.querySelector('#drugDetailPage .nearby-merchant-section');
