@@ -1000,7 +1000,7 @@ function closeSuccessModal() {
 
 // ===== My Appointments (dynamic list, no status lifecycle) =====
 const APPOINTMENTS_KEY = 'sygo_appointments';
-let currentOrderFilter = 'all';
+let currentOrderDate = '';
 
 function getMyAppointments() {
   try {
@@ -1035,32 +1035,20 @@ function formatDateTime(ts) {
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
 }
 
-function orderTimeStart() {
-  const d = new Date();
-  const day = d.getDay(); // 0=Sun
-  const diff = (day === 0 ? -6 : 1 - day); // 周一为一周起点
-  return {
-    startOfDay: new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(),
-    startOfWeek: new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff).getTime(),
-    startOfMonth: new Date(d.getFullYear(), d.getMonth(), 1).getTime()
-  };
-}
-
 function renderMyAppointments() {
   const listEl = document.getElementById('appointmentList');
   if (!listEl) return;
   let list = getMyAppointments();
   if (!list) { seedAppointments(); list = getMyAppointments(); }
-  const t = orderTimeStart();
   const filtered = (list || []).filter(a => {
-    const ts = a.createdAt || 0;
-    if (currentOrderFilter === 'today') return ts >= t.startOfDay;
-    if (currentOrderFilter === 'week') return ts >= t.startOfWeek;
-    if (currentOrderFilter === 'month') return ts >= t.startOfMonth;
-    return true;
+    if (!currentOrderDate) return true;
+    const d = new Date(a.createdAt || 0);
+    const p = n => (n < 10 ? '0' : '') + n;
+    const ds = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    return ds === currentOrderDate;
   });
   if (!filtered.length) {
-    listEl.innerHTML = '<div class="empty-tip">该时间段暂无预约记录</div>';
+    listEl.innerHTML = '<div class="empty-tip">该日期暂无预约记录</div>';
     return;
   }
   filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -1084,10 +1072,15 @@ function renderMyAppointments() {
   `).join('');
 }
 
-function filterByOrderTime(el, type) {
-  document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
-  if (el) el.classList.add('active');
-  currentOrderFilter = type;
+function filterByOrderDate(val) {
+  currentOrderDate = val || '';
+  renderMyAppointments();
+}
+
+function resetOrderDate() {
+  currentOrderDate = '';
+  const el = document.getElementById('orderDateFilter');
+  if (el) el.value = '';
   renderMyAppointments();
 }
 
