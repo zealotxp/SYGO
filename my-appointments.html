@@ -17,7 +17,9 @@
 
     <div class="order-filter">
       <label>下单日期</label>
-      <input type="date" id="orderDateFilter" onchange="filterByOrderDate(this.value)">
+      <input type="date" id="orderDateStart" onchange="filterByOrderRange()">
+      <span class="order-filter-sep">至</span>
+      <input type="date" id="orderDateEnd" onchange="filterByOrderRange()">
       <button class="btn-reset" onclick="resetOrderDate()">全部</button>
     </div>
 

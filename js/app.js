@@ -1018,7 +1018,8 @@ function closeSuccessModal() {
 
 // ===== My Appointments (dynamic list, no status lifecycle) =====
 const APPOINTMENTS_KEY = 'sygo_appointments';
-let currentOrderDate = '';
+let currentOrderStart = '';
+let currentOrderEnd = '';
 
 function getMyAppointments() {
   try {
@@ -1059,14 +1060,15 @@ function renderMyAppointments() {
   let list = getMyAppointments();
   if (!list) { seedAppointments(); list = getMyAppointments(); }
   const filtered = (list || []).filter(a => {
-    if (!currentOrderDate) return true;
     const d = new Date(a.createdAt || 0);
     const p = n => (n < 10 ? '0' : '') + n;
     const ds = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
-    return ds === currentOrderDate;
+    if (currentOrderStart && ds < currentOrderStart) return false;
+    if (currentOrderEnd && ds > currentOrderEnd) return false;
+    return true;
   });
   if (!filtered.length) {
-    listEl.innerHTML = '<div class="empty-tip">该日期暂无预约记录</div>';
+    listEl.innerHTML = '<div class="empty-tip">该时间段暂无预约记录</div>';
     return;
   }
   filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -1090,15 +1092,21 @@ function renderMyAppointments() {
   `).join('');
 }
 
-function filterByOrderDate(val) {
-  currentOrderDate = val || '';
+function filterByOrderRange() {
+  const s = document.getElementById('orderDateStart');
+  const e = document.getElementById('orderDateEnd');
+  currentOrderStart = s ? s.value : '';
+  currentOrderEnd = e ? e.value : '';
   renderMyAppointments();
 }
 
 function resetOrderDate() {
-  currentOrderDate = '';
-  const el = document.getElementById('orderDateFilter');
-  if (el) el.value = '';
+  currentOrderStart = '';
+  currentOrderEnd = '';
+  const s = document.getElementById('orderDateStart');
+  const e = document.getElementById('orderDateEnd');
+  if (s) s.value = '';
+  if (e) e.value = '';
   renderMyAppointments();
 }
 
