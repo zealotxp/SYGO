@@ -994,6 +994,7 @@ function closeSuccessModal() {
 
 // ===== My Appointments (dynamic list, no status lifecycle) =====
 const APPOINTMENTS_KEY = 'sygo_appointments';
+let currentOrderFilter = 'all';
 
 function getMyAppointments() {
   try {
@@ -1008,10 +1009,12 @@ function saveMyAppointments(list) {
 }
 
 function seedAppointments() {
+  const now = Date.now();
+  const DAY = 86400000;
   const seed = [
-    { orderNo: 'YY20260522001', drugName: '静注人免疫球蛋白(pH4)', drugSpec: '2.5g/50ml', img: 'images/drug1.jpg', merchantName: '仁济诊所(浦东店)', time: '今天 21 14:00', qty: 2, status: 'success', createdAt: Date.now() - 300000 },
-    { orderNo: 'YY20260521003', drugName: '人血白蛋白(安博灵)', drugSpec: '10g/50ml', img: 'images/drug3.jpg', merchantName: '国大诊所(徐汇店)', time: '昨天 20 10:00', qty: 1, status: 'success', createdAt: Date.now() - 600000 },
-    { orderNo: 'YY20260519005', drugName: '人血白蛋白(蜀阳)', drugSpec: '10g/50ml', img: 'images/drug5.jpg', merchantName: '益丰诊所(静安店)', time: '前天 19 15:00', qty: 3, status: 'success', createdAt: Date.now() - 900000 }
+    { orderNo: 'YY20260721001', drugName: '静注人免疫球蛋白(pH4)', drugSpec: '2.5g/50ml', img: 'images/drug1.jpg', merchantName: '仁济诊所(浦东店)', time: '今天 21 14:00', qty: 2, status: 'success', createdAt: now - 3600000 },
+    { orderNo: 'YY20260720003', drugName: '人血白蛋白(安博灵)', drugSpec: '10g/50ml', img: 'images/drug3.jpg', merchantName: '国大诊所(徐汇店)', time: '昨天 20 10:00', qty: 1, status: 'success', createdAt: now - DAY },
+    { orderNo: 'YY20260609005', drugName: '人血白蛋白(蜀阳)', drugSpec: '10g/50ml', img: 'images/drug5.jpg', merchantName: '益丰诊所(静安店)', time: '上月12日 19 15:00', qty: 3, status: 'success', createdAt: now - 40 * DAY }
   ];
   saveMyAppointments(seed);
 }
@@ -1020,17 +1023,42 @@ function escHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+function formatDateTime(ts) {
+  const d = new Date(ts);
+  const p = n => (n < 10 ? '0' : '') + n;
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function orderTimeStart() {
+  const d = new Date();
+  const day = d.getDay(); // 0=Sun
+  const diff = (day === 0 ? -6 : 1 - day); // 周一为一周起点
+  return {
+    startOfDay: new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(),
+    startOfWeek: new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff).getTime(),
+    startOfMonth: new Date(d.getFullYear(), d.getMonth(), 1).getTime()
+  };
+}
+
 function renderMyAppointments() {
   const listEl = document.getElementById('appointmentList');
   if (!listEl) return;
   let list = getMyAppointments();
   if (!list) { seedAppointments(); list = getMyAppointments(); }
-  if (!list || !list.length) {
-    listEl.innerHTML = '<div class="empty-tip">暂无预约记录</div>';
+  const t = orderTimeStart();
+  const filtered = (list || []).filter(a => {
+    const ts = a.createdAt || 0;
+    if (currentOrderFilter === 'today') return ts >= t.startOfDay;
+    if (currentOrderFilter === 'week') return ts >= t.startOfWeek;
+    if (currentOrderFilter === 'month') return ts >= t.startOfMonth;
+    return true;
+  });
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="empty-tip">该时间段暂无预约记录</div>';
     return;
   }
-  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  listEl.innerHTML = list.map(a => `
+  filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  listEl.innerHTML = filtered.map(a => `
     <div class="appointment-item">
       <div class="appointment-item-header">
         <span class="appointment-order-no">单号：${escHtml(a.orderNo)}</span>
@@ -1041,12 +1069,20 @@ function renderMyAppointments() {
         <div class="appointment-item-info">
           <div class="appointment-item-drug">${escHtml(a.drugName)}</div>
           <div class="appointment-item-merchant">${escHtml(a.merchantName)}</div>
-          <div class="appointment-item-time">📅 ${escHtml(a.time)}</div>
+          <div class="appointment-item-time">🕒 下单时间：${escHtml(formatDateTime(a.createdAt))}</div>
+          <div class="appointment-item-time">📅 预约时间：${escHtml(a.time)}</div>
           <div class="appointment-item-qty">📦 数量：${escHtml(a.qty)} 份</div>
         </div>
       </div>
     </div>
   `).join('');
+}
+
+function filterByOrderTime(el, type) {
+  document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+  if (el) el.classList.add('active');
+  currentOrderFilter = type;
+  renderMyAppointments();
 }
 
 function showToast(msg) {
