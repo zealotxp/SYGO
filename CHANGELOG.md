@@ -1,5 +1,10 @@
 # 更新记录
 
+## [1.1.0] - 2026-07-21
+- 商家详情页：移除底部「立即预约」固定操作栏（.bottom-action-bar）
+- 在售药品列表每行右侧新增「预约」按钮，点击跳转预约页并预填该药品与商家（bookDrugAtMerchant(drugId,merchantId)），按钮 onclick 用 event.stopPropagation 避免触发行跳转
+- 在售药品行右侧列改为 flex 纵向排列（库存 + 预约按钮，gap6）
+
 ## [1.0.9] - 2026-07-21
 - 药品详情页「药品介绍」区块改为药品占位图画廊：移除文字介绍，展示 6 张药品占位图（images/drug1~6.jpg，3 列网格，圆角封面）
 - goDrugDetail 不再拼装 indications/usage/contraindications/precautions 富文本，改为渲染 .drug-intro-gallery
