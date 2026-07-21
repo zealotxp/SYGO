@@ -1,5 +1,13 @@
 # 更新记录
 
+## [1.2.0] - 2026-07-21
+- 单 HTML SPA 拆分为真实多页 MPA：每页独立 html 文件，导航由 showPage/state 改为 `location.href` + URL 参数
+- 抽取共享资源：`css/common.css`（原内联样式）、`js/app.js`（原内联脚本逻辑），14 个页面统一引用
+- 页面清单（含首页 index.html）：index / search / all-drugs / all-merchants / drug-detail / merchant-detail / appointment / my-appointments / profile / about / privacy / agreement / map-picker / login
+- 跨页传参：药品/商家详情按 `?id=` 渲染（新增 renderDrugDetail / renderMerchantDetail）；预约按 `?drug=&merchant=` 预填；登录按 `?redirect=` 登录后回跳
+- 跨页临时态用 `sessionStorage`（userLocation / redirectAfterLogin）；返回用 `history.back()`
+- `body[data-page]` 属性驱动 DOMContentLoaded 分派各页初始化逻辑
+
 ## [1.1.3] - 2026-07-21
 - 预约商家改为点击弹出底部抽屉选择器：按距离（distNum）升序推荐离我最近的 5 家门店
 - 抽屉内仅「有货」（当前预约药品在售）门店可点选，无货门店置灰显示「无货」且不可选择

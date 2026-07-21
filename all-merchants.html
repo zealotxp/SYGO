@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>全部商家 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="allMerchants">
+<div class="app-container" id="app">
+<div class="modal-overlay" id="locationModal">
+    <div class="loc-permission-modal">
+      <div class="loc-permission-icon">📍</div>
+      <div class="loc-permission-title">获取您的位置信息</div>
+      <div class="loc-permission-desc">上药GO需要获取您的位置信息，以便为您推荐附近的诊所，提供更便捷的找药服务</div>
+      <div class="loc-permission-btns">
+        <button class="loc-btn-allow" onclick="allowLocation()">允许获取位置</button>
+        <button class="loc-btn-deny" onclick="denyLocation()">暂不授权</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== QR Code Modal ========== -->
+<div class="toast" id="toast"></div>
+
+  <!-- ========== Login Page ========== -->
+  <div class="login-page"
+<div class="page active" id="allMerchantsPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      附近商家
+    </div>
+
+    <div style="padding:12px 16px;background:var(--white);border-bottom:1px solid var(--border);">
+      <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
+        <div class="filter-chip active" onclick="filterMerchants(this,'all')">全部</div>
+        <div class="filter-chip" onclick="filterMerchants(this,'nearest')">距离最近</div>
+        <div class="filter-chip" onclick="filterMerchants(this,'mostDrugs')">药品最多</div>
+        <div class="filter-chip" onclick="filterMerchants(this,'certified')">资质认证</div>
+        <div class="filter-chip" onclick="filterMerchants(this,'24h')">24小时</div>
+      </div>
+    </div>
+
+    <div style="padding:10px 16px;display:flex;align-items:center;gap:6px;background:var(--primary-light);font-size:12px;color:var(--primary-dark);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;flex-shrink:0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      当前定位：浦东新区张杨路 · <span style="text-decoration:underline;cursor:pointer;" onclick="showLocationModal()">重新定位</span>
+    </div>
+
+    <div style="padding:0 16px;">
+      <div class="all-merchant-item" data-distance="0.58" data-drugcount="5" data-certified="true" data-24h="false" onclick="goMerchantDetail(1)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img">🏥</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">仁济诊所(浦东店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 浦东新区张杨路500号</div>
+          <div class="all-merchant-time">🕐 08:00-22:00</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">静注人免疫球蛋白</span>
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">+3</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">580m</div>
+          <div class="all-merchant-count">5款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="1.2" data-drugcount="4" data-certified="true" data-24h="false" onclick="goMerchantDetail(2)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:var(--primary-light);">🏪</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">国大诊所(徐汇店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 徐汇区漕溪北路200号</div>
+          <div class="all-merchant-time">🕐 07:30-22:30</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">静注人免疫球蛋白</span>
+            <span class="merchant-tag">+2</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">1.2km</div>
+          <div class="all-merchant-count">4款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="2.1" data-drugcount="2" data-certified="true" data-24h="false" onclick="goMerchantDetail(3)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#E8F0FE;">🏥</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">益丰诊所(静安店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 静安区南京西路1200号</div>
+          <div class="all-merchant-time">🕐 08:00-21:30</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">静注人免疫球蛋白</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">2.1km</div>
+          <div class="all-merchant-count">2款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="2.8" data-drugcount="2" data-certified="true" data-24h="false" onclick="goMerchantDetail(4)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#FFF3E8;">🏪</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">老百姓诊所(长宁店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 长宁区天山路800号</div>
+          <div class="all-merchant-time">🕐 08:30-21:00</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">+1</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">2.8km</div>
+          <div class="all-merchant-count">2款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="3.5" data-drugcount="6" data-certified="true" data-24h="true" onclick="goMerchantDetail(5)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#F3E8FC;">🏥</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">华氏诊所(杨浦店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 杨浦区控江路1500号</div>
+          <div class="all-merchant-time">🕐 24小时营业</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">静注人免疫球蛋白</span>
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">+4</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">3.5km</div>
+          <div class="all-merchant-count">6款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="4.2" data-drugcount="3" data-certified="true" data-24h="false" onclick="goMerchantDetail(6)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#E8FCF3;">🏪</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">海王星辰诊所(虹口店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 虹口区四川北路1800号</div>
+          <div class="all-merchant-time">🕐 08:00-22:00</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">+2</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">4.2km</div>
+          <div class="all-merchant-count">3款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="5.0" data-drugcount="5" data-certified="true" data-24h="false" onclick="goMerchantDetail(7)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#FCE8E8;">🏥</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">第一医药诊所(黄浦店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 黄浦区南京东路600号</div>
+          <div class="all-merchant-time">🕐 07:00-23:00</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">静注人免疫球蛋白</span>
+            <span class="merchant-tag">人血白蛋白</span>
+            <span class="merchant-tag">凝血因子</span>
+            <span class="merchant-tag">+2</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">5.0km</div>
+          <div class="all-merchant-count">5款在售</div>
+        </div>
+      </div>
+
+      <div class="all-merchant-item" data-distance="5.8" data-drugcount="1" data-certified="true" data-24h="false" onclick="goMerchantDetail(8)">
+        <div class="all-merchant-left">
+          <div class="all-merchant-img" style="background:#E8F0FE;">🏪</div>
+        </div>
+        <div class="all-merchant-info">
+          <div class="all-merchant-name">复美诊所(普陀店) <span class="cert-badge">✓ 执业资质</span></div>
+          <div class="all-merchant-addr">📍 普陀区曹杨路800号</div>
+          <div class="all-merchant-time">🕐 08:30-21:30</div>
+          <div class="all-merchant-tags">
+            <span class="merchant-tag">人血白蛋白</span>
+          </div>
+        </div>
+        <div class="all-merchant-right">
+          <div class="all-merchant-dist">5.8km</div>
+          <div class="all-merchant-count">1款在售</div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-more">— 已显示全部商家 —</div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

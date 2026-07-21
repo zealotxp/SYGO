@@ -1,0 +1,76 @@
+<div class="page" id="drugDetailPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      药品详情
+    </div>
+
+    <div class="drug-detail-hero">
+      <div class="drug-detail-img"><img src="images/drug1.jpg" alt="静注人免疫球蛋白"></div>
+      <div class="drug-detail-basic">
+        <div class="drug-detail-name" id="drugDetailName">静注人免疫球蛋白(pH4)</div>
+        <div class="drug-detail-spec-row">
+          <span class="drug-detail-spec" id="drugDetailSpec">武汉中原瑞德生物制品</span>
+          <span class="drug-detail-spec">·</span>
+          <span class="drug-detail-spec" id="drugDetailSpec2">2.5g/50ml/瓶</span>
+        </div>
+        <div class="drug-detail-price"><span class="yen">¥</span><span id="drugDetailPrice">--</span></div>
+      </div>
+    </div>
+
+    <div class="drug-info-section">
+      <div class="drug-info-title">药品介绍</div>
+      <div class="drug-info-content" id="drugDetailIntro"></div>
+    </div>
+
+    <!-- Nearby Merchants with this drug -->
+    <div class="nearby-merchant-section">
+      <div class="drug-info-title">附近有货商家</div>
+      <div class="nearby-merchant-item" onclick="goMerchantDetail(1)">
+        <div class="nearby-merchant-avatar">🏥</div>
+        <div class="nearby-merchant-info">
+          <div class="nearby-merchant-name">仁济诊所(浦东店)</div>
+          <div class="nearby-merchant-addr">浦东新区张杨路500号</div>
+        </div>
+        <div class="nearby-merchant-right">
+          <div class="nearby-merchant-dist">580m</div>
+          <div class="nearby-merchant-stock">有货</div>
+        </div>
+      </div>
+      <div class="nearby-merchant-item" onclick="goMerchantDetail(2)">
+        <div class="nearby-merchant-avatar">🏪</div>
+        <div class="nearby-merchant-info">
+          <div class="nearby-merchant-name">国大诊所(徐汇店)</div>
+          <div class="nearby-merchant-addr">徐汇区漕溪北路200号</div>
+        </div>
+        <div class="nearby-merchant-right">
+          <div class="nearby-merchant-dist">1.2km</div>
+          <div class="nearby-merchant-stock">有货</div>
+        </div>
+      </div>
+      <div class="nearby-merchant-item" onclick="goMerchantDetail(3)">
+        <div class="nearby-merchant-avatar">🏥</div>
+        <div class="nearby-merchant-info">
+          <div class="nearby-merchant-name">益丰诊所(静安店)</div>
+          <div class="nearby-merchant-addr">静安区南京西路1200号</div>
+        </div>
+        <div class="nearby-merchant-right">
+          <div class="nearby-merchant-dist">2.1km</div>
+          <div class="nearby-merchant-stock">库存紧张</div>
+        </div>
+      </div>
+      <div class="loading-more">— 已显示全部商家 —</div>
+    </div>
+
+    <!-- Bottom Action -->
+    <div class="bottom-action-bar">
+      <button class="btn-consult" onclick="showQR()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF8C32" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <button class="btn-primary" onclick="goAppointment()">立即预约</button>
+    </div>
+  </div>
+
+  <!-- ========== PAGE: Merchant Detail ========== -->
+  

@@ -1,33 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>上药GO - 便民找药平台</title>
-<link rel="stylesheet" href="css/common.css">
-
-</head>
-<body data-page="home">
-<div class="app-container" id="app">
-<div class="modal-overlay" id="locationModal">
-    <div class="loc-permission-modal">
-      <div class="loc-permission-icon">📍</div>
-      <div class="loc-permission-title">获取您的位置信息</div>
-      <div class="loc-permission-desc">上药GO需要获取您的位置信息，以便为您推荐附近的诊所，提供更便捷的找药服务</div>
-      <div class="loc-permission-btns">
-        <button class="loc-btn-allow" onclick="allowLocation()">允许获取位置</button>
-        <button class="loc-btn-deny" onclick="denyLocation()">暂不授权</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========== QR Code Modal ========== -->
-<div class="toast" id="toast"></div>
-
-  <!-- ========== Login Page ========== -->
-  <div class="login-page"
 <div class="page active" id="homePage">
-
+    <!-- Status + Search -->
     <div class="search-bar">
       <div class="search-input-wrap" onclick="goSearch()">
         <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -35,6 +7,7 @@
       </div>
     </div>
 
+    <!-- Location -->
     <div class="location-bar" id="locationBar">
       <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
       <span class="loc-text" id="locText" onclick="showLocationModal()">定位中...</span>
@@ -44,6 +17,7 @@
       </div>
     </div>
 
+    <!-- Swiper -->
     <div class="swiper-section">
       <div class="swiper-wrap">
         <div class="swiper-track" id="swiperTrack">
@@ -68,6 +42,7 @@
       </div>
     </div>
 
+    <!-- Hot Drugs -->
     <div class="section-header">
       <div class="section-title">主推药品</div>
       <div class="section-more" onclick="goAllDrugs()">查看更多 ›</div>
@@ -75,6 +50,7 @@
     <div class="featured-tabs" id="featuredTabs"></div>
     <div class="drug-grid" id="featuredDrugGrid"></div>
 
+    <!-- Nearby Merchants -->
     <div class="section-header">
       <div class="section-title">附近商家</div>
       <div class="section-more" onclick="goAllMerchants()">查看更多 ›</div>
@@ -126,26 +102,3 @@
     <div class="loading-more">— 更多商家敬请期待 —</div>
   </div>
   
-  <div class="tab-bar" id="tabBar">
-    <div class="tab-item active" onclick="switchTab('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>首页</span>
-    </div>
-    <div class="tab-item" onclick="switchTab('search')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <span>搜索</span>
-    </div>
-    <div class="tab-item" onclick="goMyAppointments()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <span>预约</span>
-    </div>
-    <div class="tab-item" onclick="switchTab('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>我的</span>
-    </div>
-  </div>
-</div>
-
-<script src="js/app.js"></script>
-</body>
-</html>

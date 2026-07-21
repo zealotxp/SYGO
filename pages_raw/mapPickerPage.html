@@ -1,0 +1,68 @@
+<div class="page" id="mapPickerPage">
+    <div class="map-picker-nav">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <span class="map-picker-title">选择位置</span>
+      <span style="width:24px;"></span>
+    </div>
+
+    <!-- 省 / 市 / 区 三级联动选择 -->
+    <div class="city-bar" onclick="toggleCityList()">
+      <span class="city-current" id="pickerCityName">上海市 · 浦东新区</span>
+      <svg class="city-arrow" id="cityArrow" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="city-panel" id="cityPanel" style="display:none;">
+      <div class="region-cascader">
+        <div class="region-col" id="regionProvinceCol"></div>
+        <div class="region-col" id="regionCityCol"></div>
+        <div class="region-col" id="regionDistrictCol"></div>
+      </div>
+    </div>
+
+    <!-- 地名搜索 -->
+    <div class="map-search-wrap">
+      <div class="map-search-field">
+        <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="mapSearchInput" class="map-search-input" placeholder="输入地名搜索，如 人民广场" oninput="searchMapPlaces(this.value)">
+      </div>
+      <button class="map-search-btn" onclick="doSearch()">搜索</button>
+      <div class="map-search-results" id="mapSearchResults" style="display:none;"></div>
+    </div>
+
+    <!-- 地图 -->
+    <div class="map-container" id="mapContainer"></div>
+    <div class="map-tip">点击地图任意位置可手动选点，或拖动标记微调</div>
+
+    <!-- 确认栏 -->
+    <div class="map-confirm-bar">
+      <div class="map-selected">
+        <div class="map-selected-label">已选位置</div>
+        <div class="map-selected-text" id="mapSelectedText">请在地图上选择位置</div>
+      </div>
+      <button class="map-confirm-btn" onclick="confirmLocation()">确定</button>
+    </div>
+  </div>
+
+  <!-- ========== Tab Bar ========== -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-item active" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab-item" onclick="switchTab('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>搜索</span>
+    </div>
+    <div class="tab-item" onclick="goMyAppointments()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>预约</span>
+    </div>
+    <div class="tab-item" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+
+</div>
+

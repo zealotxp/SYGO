@@ -1,0 +1,60 @@
+<div class="page" id="profilePage">
+    <div class="profile-header">
+      <div class="profile-user">
+        <div class="profile-avatar" onclick="changeAvatar()">👤</div>
+        <div>
+          <div class="profile-name" onclick="editName()">微信用户</div>
+          <div class="profile-id">ID: 100238</div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat" onclick="goMyAppointments()" style="cursor:pointer;">
+          <div class="profile-stat-num">1</div>
+          <div class="profile-stat-label">待到店</div>
+        </div>
+        <div class="profile-stat" onclick="goMyAppointments()" style="cursor:pointer;">
+          <div class="profile-stat-num">1</div>
+          <div class="profile-stat-label">已核销</div>
+        </div>
+        <div class="profile-stat" onclick="goMyAppointments()" style="cursor:pointer;">
+          <div class="profile-stat-num">1</div>
+          <div class="profile-stat-label">已取消</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-menu">
+      <div class="profile-menu-item" onclick="goMyAppointments()">
+        <div class="profile-menu-icon" style="background:var(--primary-light);">📋</div>
+        <div class="profile-menu-text">我的预约</div>
+        <span class="profile-menu-badge">1</span>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+      <div class="profile-menu-item" onclick="showQR()">
+        <div class="profile-menu-icon" style="background:#E8F0FE;">💬</div>
+        <div class="profile-menu-text">在线客服</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="profile-menu-item2" style="margin-top:10px;">
+      <div class="profile-menu-item" onclick="showAbout()">
+        <div class="profile-menu-icon" style="background:var(--orange-light);">ℹ️</div>
+        <div class="profile-menu-text">关于我们</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+      <div class="profile-menu-item" onclick="showPrivacy()">
+        <div class="profile-menu-icon" style="background:#FCE8E8;">🔒</div>
+        <div class="profile-menu-text">隐私政策</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+      <div class="profile-menu-item" onclick="showUserAgreement()">
+        <div class="profile-menu-icon" style="background:#E8F0FE;">📋</div>
+        <div class="profile-menu-text">用户协议</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PAGE: About ========== -->
+  

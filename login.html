@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>登录 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="login">
+<div class="app-container" id="app">
+<div class="toast" id="toast"></div>
+
+  <!-- ========== Login Page ========== -->
+  <div class="login-page"
+<div class="login-page" id="loginPage">
+    <div class="login-header">
+      <div class="login-logo">药</div>
+      <div class="login-title">上药GO</div>
+      <div class="login-subtitle">便民找药 · 就在身边</div>
+    </div>
+    <div class="login-card">
+      <button class="login-btn" onclick="doLogin()">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.193.589-.592 1.785a.59.59 0 0 0 .633.774l.192-.044 2.7-.84a.59.59 0 0 1 .393.014c.816.268 1.693.414 2.603.414.242 0 .48-.012.716-.034a6.87 6.87 0 0 1-.272-1.918c0-3.657 3.462-6.624 7.728-6.624.246 0 .488.013.727.036C16.576 4.726 12.936 2.188 8.69 2.188z"/></svg>
+        微信一键登录
+      </button>
+      <input class="login-phone-input" type="tel" placeholder="请输入手机号（用于登录与预约联系）" id="loginPhone" maxlength="11">
+      <div class="login-privacy">
+        登录即代表同意 <a href="javascript:void(0)" onclick="showUserAgreement()">《用户协议》</a> 和 <a href="javascript:void(0)" onclick="showPrivacy()">《隐私政策》</a>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

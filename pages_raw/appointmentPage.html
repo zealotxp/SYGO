@@ -1,0 +1,84 @@
+<div class="page" id="appointmentPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      预约购药
+    </div>
+
+    <div class="appointment-form slide-up">
+      <!-- Drug Selection -->
+      <div class="form-group">
+        <div class="form-label">预约药品 <span class="required">*</span></div>
+        <input class="form-input" type="text" placeholder="请选择预约药品" id="appointDrug" value="静注人免疫球蛋白(pH4) 2.5g/50ml" readonly>
+      </div>
+
+      <!-- Quantity -->
+      <div class="form-group">
+        <div class="form-label">药品数量 <span class="required">*</span></div>
+        <div class="qty-stepper">
+          <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-value" id="appointQty">1</span>
+          <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Date Selection -->
+      <div class="form-group">
+        <div class="form-label">预约日期 <span class="required">*</span></div>
+        <div class="date-selector" id="dateSelector"></div>
+      </div>
+
+      <!-- Time Selection -->
+      <div class="form-group">
+        <div class="form-label">预约时段 <span class="required">*</span></div>
+        <div class="time-slots">
+          <div class="time-slot" onclick="selectTime(this)">09:00</div>
+          <div class="time-slot" onclick="selectTime(this)">10:00</div>
+          <div class="time-slot" onclick="selectTime(this)">11:00</div>
+          <div class="time-slot disabled">12:00</div>
+          <div class="time-slot" onclick="selectTime(this)">13:00</div>
+          <div class="time-slot" onclick="selectTime(this)">14:00</div>
+          <div class="time-slot" onclick="selectTime(this)">15:00</div>
+          <div class="time-slot" onclick="selectTime(this)">16:00</div>
+          <div class="time-slot" onclick="selectTime(this)">17:00</div>
+        </div>
+      </div>
+
+      <!-- Merchant -->
+      <div class="form-group">
+        <div class="form-label">预约商家 <span class="required">*</span></div>
+        <div class="form-input select-field" id="appointMerchant" onclick="showMerchantPicker()">
+          <span id="appointMerchantText">仁济诊所(浦东店)</span>
+          <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-group">
+        <div class="form-label">姓名 <span class="required">*</span></div>
+        <input class="form-input" type="text" placeholder="请输入您的姓名" id="appointName" oninput="validateName(this)">
+        <div class="form-error-tip" id="nameError">请输入姓名</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <div class="form-label">手机号码 <span class="required">*</span></div>
+        <input class="form-input" type="tel" placeholder="请输入手机号码" id="appointPhone" maxlength="11" oninput="validatePhone(this)">
+        <div class="form-error-tip" id="phoneError">请输入正确的11位手机号码</div>
+      </div>
+
+      <!-- Remarks -->
+      <div class="form-group">
+        <div class="form-label">备注</div>
+        <textarea class="form-textarea" placeholder="请输入备注信息（非必填）" id="appointRemark"></textarea>
+      </div>
+    </div>
+
+    <div class="bottom-action-bar">
+      <button class="btn-primary" onclick="submitAppointment()">提交预约</button>
+    </div>
+  </div>
+
+  <!-- ========== PAGE: My Appointments ========== -->
+  

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>全部药品 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="allDrugs">
+<div class="app-container" id="app">
+<div class="toast" id="toast"></div>
+
+  <!-- ========== Login Page ========== -->
+  <div class="login-page"
+<div class="page active" id="allDrugsPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      全部药品
+    </div>
+
+    <div style="padding:12px 16px;background:var(--white);border-bottom:1px solid var(--border);">
+      <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
+        <div class="filter-chip active" onclick="filterDrugs(this,'all')">全部</div>
+        <div class="filter-chip" onclick="filterDrugs(this,'immunoglobulin')">免疫球蛋白</div>
+        <div class="filter-chip" onclick="filterDrugs(this,'albumin')">人血白蛋白</div>
+        <div class="filter-chip" onclick="filterDrugs(this,'factor')">凝血因子</div>
+        <div class="filter-chip" onclick="filterDrugs(this,'vaccine')">疫苗制品</div>
+      </div>
+    </div>
+
+    <div style="padding:10px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--white);margin-bottom:8px;">
+      <span style="font-size:13px;color:var(--text-secondary);">共 <b style="color:var(--text);" class="drug-count-num">13</b> 款药品</span>
+      <div style="display:flex;gap:16px;">
+        <span class="sort-item active" onclick="sortDrugs(this,'default')">综合排序</span>
+        <span class="sort-item" onclick="sortDrugs(this,'distance')">距离优先</span>
+        <span class="sort-item" onclick="sortDrugs(this,'stock')">库存优先</span>
+      </div>
+    </div>
+
+    <div class="all-drug-list" style="padding:0 16px;">
+      <div class="all-drug-item" data-id="1" data-category="immunoglobulin" data-distance="0.58" data-stock="3" onclick="goDrugDetail(1)">
+        <div class="all-drug-img"><img src="images/drug1.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">静注人免疫球蛋白(pH4)</div>
+          <div class="all-drug-spec">武汉中原瑞德生物制品 · 2.5g/50ml/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-green">免疫球蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">3家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="2" data-category="immunoglobulin" data-distance="1.2" data-stock="2" onclick="goDrugDetail(2)">
+        <div class="all-drug-img"><img src="images/drug2.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">静注人免疫球蛋白(pH4)</div>
+          <div class="all-drug-spec">四川远大蜀阳药业 · 2.5g/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-green">免疫球蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">2家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="3" data-category="albumin" data-distance="0.58" data-stock="4" onclick="goDrugDetail(3)">
+        <div class="all-drug-img"><img src="images/drug3.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人血白蛋白</div>
+          <div class="all-drug-spec">瑞士杰特贝林生物制品 · 10g(20% 50ml)</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-orange">人血白蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+            <span class="drug-tag-red">进口</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">4家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="4" data-category="albumin" data-distance="2.8" data-stock="3" onclick="goDrugDetail(4)">
+        <div class="all-drug-img"><img src="images/drug4.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人血白蛋白</div>
+          <div class="all-drug-spec">山东泰邦生物制品 · 10g(20% 50ml)</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-orange">人血白蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">3家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="5" data-category="albumin" data-distance="2.1" data-stock="2" onclick="goDrugDetail(5)">
+        <div class="all-drug-img"><img src="images/drug5.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人血白蛋白</div>
+          <div class="all-drug-spec">四川远大蜀阳药业 · 10g(20% 50ml)</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-orange">人血白蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">2家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="6" data-category="albumin" data-distance="0.58" data-stock="3" onclick="goDrugDetail(6)">
+        <div class="all-drug-img"><img src="images/drug6.jpg" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人血白蛋白</div>
+          <div class="all-drug-spec">武汉中原瑞德生物制品 · 20% 50ml</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-orange">人血白蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">3家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="7" data-category="albumin" data-distance="0.58" data-stock="5" onclick="goDrugDetail(7)">
+        <div class="all-drug-img"><img src="images/promo-main.png" alt=""></div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人血白蛋白(安博灵)</div>
+          <div class="all-drug-spec">瑞士杰特贝林生物制品 · 10g(20% 50ml)</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-orange">人血白蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+            <span class="drug-tag-red">进口</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">5家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="8" data-category="immunoglobulin" data-distance="2.8" data-stock="2" onclick="goDrugDetail(8)">
+        <div class="all-drug-img" style="background:var(--primary-light);font-size:28px;">💉</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">破伤风人免疫球蛋白</div>
+          <div class="all-drug-spec">华兰生物工程 · 250IU/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-green">免疫球蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">2家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="9" data-category="factor" data-distance="5.0" data-stock="1" onclick="goDrugDetail(9)">
+        <div class="all-drug-img" style="background:#FFF3E8;font-size:28px;">🧪</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人凝血因子VIII</div>
+          <div class="all-drug-spec">上海莱士血液制品 · 200IU/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-purple">凝血因子</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">1家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="10" data-category="factor" data-distance="5.0" data-stock="1" onclick="goDrugDetail(10)">
+        <div class="all-drug-img" style="background:#E8F0FE;font-size:28px;">💊</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人凝血酶原复合物</div>
+          <div class="all-drug-spec">华兰生物工程 · 300IU/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-purple">凝血因子</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">1家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="11" data-category="factor" data-distance="3.5" data-stock="2" onclick="goDrugDetail(11)">
+        <div class="all-drug-img" style="background:#FCE8E8;font-size:28px;">🩸</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">人纤维蛋白原</div>
+          <div class="all-drug-spec">上海莱士血液制品 · 0.5g/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-purple">凝血因子</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">2家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="12" data-category="immunoglobulin" data-distance="1.2" data-stock="3" onclick="goDrugDetail(12)">
+        <div class="all-drug-img" style="background:#F3E8FC;font-size:28px;">🧬</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">乙型肝炎人免疫球蛋白</div>
+          <div class="all-drug-spec">四川远大蜀阳药业 · 200IU/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-green">免疫球蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">3家在售</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="all-drug-item" data-id="13" data-category="immunoglobulin" data-distance="0.58" data-stock="2" onclick="goDrugDetail(13)">
+        <div class="all-drug-img" style="background:#E8FCF3;font-size:28px;">🔬</div>
+        <div class="all-drug-info">
+          <div class="all-drug-name">狂犬病人免疫球蛋白</div>
+          <div class="all-drug-spec">华兰生物工程 · 200IU/瓶</div>
+          <div class="all-drug-tags">
+            <span class="drug-tag-green">免疫球蛋白</span>
+            <span class="drug-tag-blue">处方药</span>
+          </div>
+          <div class="all-drug-bottom">
+            <span class="all-drug-price"><span class="yen">¥</span>--</span>
+            <span class="all-drug-stock">2家在售</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-more">— 已显示全部药品 —</div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

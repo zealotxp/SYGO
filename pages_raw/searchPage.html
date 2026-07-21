@@ -1,0 +1,33 @@
+<div class="search-results-page" id="searchPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);">
+      <div class="search-input-wrap" style="flex:1;margin:0 12px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="搜索药品名称、厂家、商家" id="searchInput" oninput="handleSearch()">
+        <svg class="clear-btn" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" onclick="clearSearch()"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <span style="font-size:14px;color:var(--primary);margin-right:12px;cursor:pointer;white-space:nowrap;" onclick="cancelSearch()">取消</span>
+    </div>
+    <div id="searchResults">
+      <div class="search-result-section">
+        <div class="search-result-section-title">热门搜索</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="merchant-tag" onclick="searchFor('人血白蛋白')" style="cursor:pointer;">人血白蛋白</span>
+          <span class="merchant-tag" onclick="searchFor('静注人免疫球蛋白')" style="cursor:pointer;">静注人免疫球蛋白</span>
+          <span class="merchant-tag" onclick="searchFor('免疫球蛋白')" style="cursor:pointer;">免疫球蛋白</span>
+          <span class="merchant-tag" onclick="searchFor('白蛋白')" style="cursor:pointer;">白蛋白</span>
+          <span class="merchant-tag" onclick="searchFor('血液制品')" style="cursor:pointer;">血液制品</span>
+        </div>
+      </div>
+      <div class="search-result-section">
+        <div class="search-result-section-title">搜索历史</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="merchant-tag" onclick="searchFor('人血白蛋白')" style="cursor:pointer;">人血白蛋白</span>
+          <span class="merchant-tag" onclick="searchFor('杰特贝林')" style="cursor:pointer;">杰特贝林</span>
+        </div>
+      </div>
+    </div>
+    <div id="searchResultList" style="display:none;padding:12px 16px;"></div>
+  </div>
+
+  <!-- ========== PAGE: Drug Detail ========== -->
+  
