@@ -2858,7 +2858,7 @@
         <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="mapSearchInput" class="map-search-input" placeholder="输入地名搜索，如 人民广场" oninput="searchMapPlaces(this.value)">
       </div>
-      <button class="map-search-btn" onclick="searchMapPlaces(document.getElementById('mapSearchInput').value)">搜索</button>
+      <button class="map-search-btn" onclick="doSearch()">搜索</button>
       <div class="map-search-results" id="mapSearchResults" style="display:none;"></div>
     </div>
 
@@ -3307,7 +3307,43 @@ function updateSelectedText() {
   document.getElementById('mapSelectedText').textContent = txt;
 }
 
-function searchMapPlaces(keyword) {
+function doSearch() {
+  const kw = (document.getElementById('mapSearchInput').value || '').trim();
+  if (kw === '') { searchMapPlaces(''); return; }
+  // 优先当前城市
+  let match = (MAP_POIS[currentPickerCity] || []).filter(p => p.name.indexOf(kw) !== -1);
+  let hitProvince = currentPickerProvince;
+  let hitCity = currentPickerCity;
+  // 当前城市无结果则跨城市搜索
+  if (match.length === 0) {
+    outer:
+    for (const prov in REGION_DATA) {
+      for (const c in REGION_DATA[prov].cities) {
+        const found = (MAP_POIS[c] || []).filter(p => p.name.indexOf(kw) !== -1);
+        if (found.length > 0) { match = found; hitProvince = prov; hitCity = c; break outer; }
+      }
+    }
+  }
+  if (match.length > 0 && mapPickerMap) {
+    // 命中其它城市时，联动切换到该城市
+    if (hitCity !== currentPickerCity) {
+      currentPickerProvince = hitProvince;
+      currentPickerCity = hitCity;
+      currentPickerDistrict = Object.keys(REGION_DATA[hitProvince].cities[hitCity].districts)[0];
+      document.getElementById('pickerCityName').textContent = currentPickerProvince + ' · ' + currentPickerCity + ' · ' + currentPickerDistrict;
+      if (document.getElementById('cityPanel').style.display !== 'none') renderProvinceCol();
+    }
+    mapPickerMap.setView(match[0].coord, 15);
+    addOrMoveMarker(match[0].coord);
+    selectedLocation = { province:currentPickerProvince, city:currentPickerCity, district:currentPickerDistrict, name:'', lat:match[0].coord[0], lng:match[0].coord[1] };
+    updateSelectedText();
+  }
+  // 下拉框展示命中城市的结果
+  searchMapPlaces(kw, hitCity);
+}
+
+function searchMapPlaces(keyword, cityName) {
+  const city = cityName || currentPickerCity;
   const box = document.getElementById('mapSearchResults');
   const kw = (keyword || '').trim();
   if (kw === '') {
@@ -3315,7 +3351,7 @@ function searchMapPlaces(keyword) {
     box.innerHTML = '';
     return;
   }
-  const list = (MAP_POIS[currentPickerCity] || []).filter(p => p.name.indexOf(kw) !== -1);
+  const list = (MAP_POIS[city] || []).filter(p => p.name.indexOf(kw) !== -1);
   if (list.length === 0) {
     box.innerHTML = '<div class="map-search-empty">未找到相关地点</div>';
     box.style.display = 'block';
@@ -3325,7 +3361,7 @@ function searchMapPlaces(keyword) {
   list.forEach(p => {
     const item = document.createElement('div');
     item.className = 'map-search-item';
-    item.innerHTML = '<span>📍 ' + p.name + '</span><span style="color:#999;font-size:12px;">' + currentPickerProvince + '·' + currentPickerCity + '</span>';
+    item.innerHTML = '<span>📍 ' + p.name + '</span><span style="color:#999;font-size:12px;">' + currentPickerProvince + '·' + city + '</span>';
     item.onclick = () => {
       selectedLocation.name = p.name;
       selectedLocation.lat = p.coord[0];
