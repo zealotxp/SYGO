@@ -1427,16 +1427,85 @@ function renderMerchantOrders() {
       </div>
     </div>`).join('');
 }
-function filterMerchantOrdersRange() {
-  const s = document.getElementById('merchantOrderStart'); const e = document.getElementById('merchantOrderEnd');
-  merchantOrderStart = s ? s.value : ''; merchantOrderEnd = e ? e.value : '';
-  renderMerchantOrders();
+// 手机端底部日历区间选择器
+let mPickerStart = '', mPickerEnd = '', mPickerTarget = 'start';
+let mPickerMonth = new Date();
+function mDatePad(n) { return (n < 10 ? '0' : '') + n; }
+function openMerchantDatePicker() {
+  mPickerStart = merchantOrderStart; mPickerEnd = merchantOrderEnd;
+  mPickerTarget = mPickerStart ? 'end' : 'start';
+  const base = mPickerStart || mPickerEnd || ymd(new Date());
+  const parts = base.split('-'); mPickerMonth = new Date(+parts[0], +parts[1] - 1, 1);
+  const p = document.getElementById('merchantDatePicker'); if (p) p.classList.add('show');
+  renderMerchantDateGrid(); updateMerchantDateFields();
+}
+function closeMerchantDatePicker() {
+  const p = document.getElementById('merchantDatePicker'); if (p) p.classList.remove('show');
+}
+function setMerchantDateTarget(which) {
+  mPickerTarget = which; updateMerchantDateFields();
+  const d = which === 'start' ? mPickerStart : mPickerEnd;
+  if (d) { const parts = d.split('-'); const nd = new Date(+parts[0], +parts[1] - 1, 1); if (nd.getFullYear() !== mPickerMonth.getFullYear() || nd.getMonth() !== mPickerMonth.getMonth()) { mPickerMonth = nd; renderMerchantDateGrid(); } }
+}
+function shiftMerchantMonth(delta) {
+  mPickerMonth = new Date(mPickerMonth.getFullYear(), mPickerMonth.getMonth() + delta, 1);
+  renderMerchantDateGrid();
+}
+function renderMerchantDateGrid() {
+  const grid = document.getElementById('mDateGrid'); if (!grid) return;
+  const y = mPickerMonth.getFullYear(), mo = mPickerMonth.getMonth();
+  const first = new Date(y, mo, 1); const startW = first.getDay();
+  const daysInMonth = new Date(y, mo + 1, 0).getDate();
+  const prevDays = new Date(y, mo, 0).getDate();
+  const lbl = document.getElementById('mDateMonthLabel'); if (lbl) lbl.textContent = y + '年' + (mo + 1) + '月';
+  const today = ymd(new Date());
+  let html = '';
+  for (let i = startW - 1; i >= 0; i--) html += `<div class="m-date-day muted">${prevDays - i}</div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = y + '-' + mDatePad(mo + 1) + '-' + mDatePad(d);
+    let cls = 'm-date-day';
+    if (ds === today) cls += ' today';
+    if (ds === mPickerStart || ds === mPickerEnd) cls += ' selected';
+    else if (mPickerStart && mPickerEnd && ds > mPickerStart && ds < mPickerEnd) cls += ' in-range';
+    html += `<div class="${cls}" data-d="${ds}" onclick="onMerchantDayTap('${ds}')">${d}</div>`;
+  }
+  const total = startW + daysInMonth; const trail = (7 - (total % 7)) % 7;
+  for (let d = 1; d <= trail; d++) html += `<div class="m-date-day muted">${d}</div>`;
+  grid.innerHTML = html;
+}
+function onMerchantDayTap(ds) {
+  if (mPickerTarget === 'start' || !mPickerStart) { mPickerStart = ds; mPickerEnd = ''; mPickerTarget = 'end'; }
+  else if (ds < mPickerStart) { mPickerStart = ds; }
+  else { mPickerEnd = ds; mPickerTarget = 'start'; }
+  renderMerchantDateGrid(); updateMerchantDateFields();
+}
+function updateMerchantDateFields() {
+  const sf = document.getElementById('mDateStartField'), ef = document.getElementById('mDateEndField');
+  const sv = document.getElementById('mDateStartVal'), ev = document.getElementById('mDateEndVal');
+  if (sv) sv.textContent = mPickerStart ? mPickerStart.slice(5) : '请选择';
+  if (ev) ev.textContent = mPickerEnd ? mPickerEnd.slice(5) : '请选择';
+  if (sf) sf.classList.toggle('active', mPickerTarget === 'start');
+  if (ef) ef.classList.toggle('active', mPickerTarget === 'end');
+}
+function confirmMerchantDateRange() {
+  merchantOrderStart = mPickerStart; merchantOrderEnd = mPickerEnd;
+  updateMerchantOrderTrigger(); closeMerchantDatePicker(); renderMerchantOrders();
 }
 function resetMerchantOrderRange() {
   merchantOrderStart = ''; merchantOrderEnd = '';
-  const s = document.getElementById('merchantOrderStart'); const e = document.getElementById('merchantOrderEnd');
-  if (s) s.value = ''; if (e) e.value = '';
-  renderMerchantOrders();
+  mPickerStart = ''; mPickerEnd = '';
+  updateMerchantOrderTrigger(); renderMerchantOrders();
+}
+function resetMerchantDateRange() {
+  mPickerStart = ''; mPickerEnd = ''; mPickerTarget = 'start';
+  renderMerchantDateGrid(); updateMerchantDateFields();
+}
+function updateMerchantOrderTrigger() {
+  const t = document.getElementById('merchantOrderTrigger'); if (!t) return;
+  if (merchantOrderStart && merchantOrderEnd) t.textContent = merchantOrderStart.slice(5) + ' 至 ' + merchantOrderEnd.slice(5);
+  else if (merchantOrderStart) t.textContent = merchantOrderStart.slice(5) + ' 起';
+  else if (merchantOrderEnd) t.textContent = '至 ' + merchantOrderEnd.slice(5);
+  else t.textContent = '全部日期';
 }
 function searchMerchantOrder() {
   const el = document.getElementById('merchantOrderSearch');
