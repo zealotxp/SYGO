@@ -1,5 +1,9 @@
 # 更新记录
 
+## [1.0.8] - 2026-07-21
+- 收紧首页元素间距，确保首屏可见 banner + 4 个主推药品 + 1 个附近商家
+- 搜索栏/定位栏 padding 下调；轮播高度 160→110px；section-header padding 20/12→12/8；分类TAB padding 10/4→8/2；药品图 82→70px；商家卡 padding 14→10、头像 72→64px
+
 ## [1.0.7] - 2026-07-21
 - 药品详情页：移除「适应症 / 用法用量 / 禁忌 / 注意事项」四个独立区块，合并为单个「药品介绍」富文本区块
 - 富文本内容由 drugsData 的 indications/usage/contraindications/precautions 字段动态拼装（带小标题），保留全部信息；新增 p 段落间距样式
