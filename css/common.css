@@ -1452,7 +1452,7 @@
 
   /* ===== Login Page ===== */
   .login-page {
-    display: none;
+    display: block;
     min-height: 100vh;
     background: linear-gradient(180deg, var(--primary) 0%, #5CD89D 40%, var(--bg) 40%);
   }

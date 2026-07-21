@@ -1,5 +1,8 @@
 # 更新记录
 
+## [1.2.1] - 2026-07-21
+- 修复白屏：去除误注入的未闭合 login-page 遮罩，登录页改为 display:block
+
 ## [1.2.0] - 2026-07-21
 - 单 HTML SPA 拆分为真实多页 MPA：每页独立 html 文件，导航由 showPage/state 改为 `location.href` + URL 参数
 - 抽取共享资源：`css/common.css`（原内联样式）、`js/app.js`（原内联脚本逻辑），14 个页面统一引用
