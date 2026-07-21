@@ -434,7 +434,7 @@
   .drug-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
     padding: 0 16px;
   }
   .drug-card {
@@ -447,11 +447,11 @@
   }
   .drug-card:active { transform: scale(0.97); }
   .drug-card-img {
-    height: 104px;
+    height: 82px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 26px;
     background: #fff;
     overflow: hidden;
   }
@@ -459,11 +459,11 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 6px;
+    padding: 4px;
   }
-  .drug-card-info { padding: 8px 10px; }
+  .drug-card-info { padding: 6px 8px; }
   .drug-card-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
@@ -471,9 +471,9 @@
     text-overflow: ellipsis;
   }
   .drug-card-spec {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--text-secondary);
-    margin-top: 2px;
+    margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -482,19 +482,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 5px;
+    margin-top: 4px;
   }
   .drug-card-price {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--red);
   }
-  .drug-card-price .yen { font-size: 10px; }
+  .drug-card-price .yen { font-size: 9px; }
   .drug-card-stock {
-    font-size: 9px;
+    font-size: 8px;
     color: var(--primary);
     background: var(--primary-light);
-    padding: 2px 6px;
+    padding: 1px 5px;
     border-radius: 10px;
   }
 
@@ -3561,8 +3561,10 @@ function renderFeaturedDrugs() {
   const list = currentFeaturedCategory === 'all'
     ? drugsData
     : drugsData.filter(d => d.category === currentFeaturedCategory);
+  // 每个 TAB 最多展示 4 个药品，保证首屏能同时看到药品与下方商家
+  const display = list.slice(0, 4);
   grid.innerHTML = '';
-  list.forEach(d => {
+  display.forEach(d => {
     const card = document.createElement('div');
     card.className = 'drug-card';
     card.setAttribute('onclick', 'goDrugDetail(' + d.id + ')');
