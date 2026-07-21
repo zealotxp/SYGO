@@ -214,25 +214,36 @@
   .city-panel {
     background: var(--white);
     border-bottom: 1px solid var(--border);
-    padding: 12px 16px;
+    padding: 0;
     flex-shrink: 0;
   }
-  .city-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-  .city-item {
-    padding: 6px 14px;
-    border-radius: 16px;
-    background: var(--bg);
+  .region-cascader { display: flex; height: 220px; }
+  .region-col {
+    flex: 1;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .region-col:last-child { border-right: none; }
+  .region-opt {
+    padding: 11px 6px;
     font-size: 13px;
     color: var(--text);
+    text-align: center;
     cursor: pointer;
-    border: 1px solid transparent;
+    border-bottom: 1px solid #f3f3f3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .city-item.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); font-weight: 600; }
-  .map-search-wrap { position: relative; padding: 10px 16px; background: var(--white); flex-shrink: 0; }
-  .map-search-icon { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; }
+  .region-opt.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .region-opt:active { background: var(--bg); }
+  .map-search-wrap { display: flex; align-items: center; gap: 8px; position: relative; padding: 10px 16px; background: var(--white); flex-shrink: 0; }
+  .map-search-field { position: relative; flex: 1; display: flex; align-items: center; }
+  .map-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; pointer-events: none; }
   .map-search-input {
     width: 100%;
-    padding: 10px 12px 10px 40px;
+    padding: 10px 12px 10px 38px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 14px;
@@ -240,10 +251,22 @@
     outline: none;
   }
   .map-search-input:focus { border-color: var(--primary); }
+  .map-search-btn {
+    flex-shrink: 0;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 0 18px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .map-search-btn:active { opacity: 0.85; }
   .map-search-results {
     position: absolute;
     left: 16px;
-    right: 16px;
+    right: 82px;
     top: 58px;
     background: var(--white);
     border-radius: 8px;
@@ -2816,19 +2839,26 @@
       <span style="width:24px;"></span>
     </div>
 
-    <!-- 城市选择 -->
+    <!-- 省 / 市 / 区 三级联动选择 -->
     <div class="city-bar" onclick="toggleCityList()">
-      <span class="city-current" id="pickerCityName">上海市</span>
+      <span class="city-current" id="pickerCityName">上海市 · 浦东新区</span>
       <svg class="city-arrow" id="cityArrow" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
     <div class="city-panel" id="cityPanel" style="display:none;">
-      <div class="city-grid" id="cityGrid"></div>
+      <div class="region-cascader">
+        <div class="region-col" id="regionProvinceCol"></div>
+        <div class="region-col" id="regionCityCol"></div>
+        <div class="region-col" id="regionDistrictCol"></div>
+      </div>
     </div>
 
     <!-- 地名搜索 -->
     <div class="map-search-wrap">
-      <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="mapSearchInput" class="map-search-input" placeholder="输入地名搜索，如 人民广场" oninput="searchMapPlaces(this.value)">
+      <div class="map-search-field">
+        <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="mapSearchInput" class="map-search-input" placeholder="输入地名搜索，如 人民广场" oninput="searchMapPlaces(this.value)">
+      </div>
+      <button class="map-search-btn" onclick="searchMapPlaces(document.getElementById('mapSearchInput').value)">搜索</button>
       <div class="map-search-results" id="mapSearchResults" style="display:none;"></div>
     </div>
 
@@ -2952,18 +2982,113 @@ function denyLocation() {
 }
 
 // ===== 手动定位：地图选点 =====
-const MAP_CITIES = [
-  { name:'上海市', center:[31.2304, 121.4737], zoom:12 },
-  { name:'北京市', center:[39.9042, 116.4074], zoom:11 },
-  { name:'广州市', center:[23.1291, 113.2644], zoom:12 },
-  { name:'深圳市', center:[22.5431, 114.0579], zoom:12 },
-  { name:'杭州市', center:[30.2741, 120.1551], zoom:12 },
-  { name:'成都市', center:[30.5728, 104.0668], zoom:12 },
-  { name:'南京市', center:[32.0603, 118.7969], zoom:12 },
-  { name:'武汉市', center:[30.5928, 114.3055], zoom:12 },
-  { name:'重庆市', center:[29.5630, 106.5516], zoom:12 },
-  { name:'西安市', center:[34.3416, 108.9398], zoom:12 }
-];
+// ===== 省 / 市 / 区 三级联动数据 (含中心坐标, 用于地图定位) =====
+const REGION_DATA = {
+  '北京市': { center:[39.9042, 116.4074], cities: {
+    '北京市': { center:[39.9042, 116.4074], districts: {
+      '东城区':[39.9175, 116.4167], '西城区':[39.9152, 116.3660], '朝阳区':[39.9219, 116.4435],
+      '海淀区':[39.9599, 116.2981], '丰台区':[39.8585, 116.2867], '通州区':[39.9097, 116.6569]
+    }}
+  }},
+  '上海市': { center:[31.2304, 121.4737], cities: {
+    '上海市': { center:[31.2304, 121.4737], districts: {
+      '黄浦区':[31.2304, 121.4844], '徐汇区':[31.1886, 121.4371], '长宁区':[31.2205, 121.4243],
+      '静安区':[31.2290, 121.4485], '浦东新区':[31.2217, 121.5440], '杨浦区':[31.2593, 121.5266]
+    }}
+  }},
+  '广东省': { center:[23.1291, 113.2644], cities: {
+    '广州市': { center:[23.1291, 113.2644], districts: {
+      '天河区':[23.1247, 113.3614], '越秀区':[23.1289, 113.2676], '海珠区':[23.0838, 113.3170], '番禺区':[22.9371, 113.3846]
+    }},
+    '深圳市': { center:[22.5429, 114.0596], districts: {
+      '福田区':[22.5212, 114.0589], '南山区':[22.5318, 114.0750], '罗湖区':[22.5559, 114.1235], '宝安区':[22.5559, 113.8831]
+    }},
+    '东莞市': { center:[23.0207, 113.7518], districts: {
+      '莞城街道':[23.0207, 113.7518], '南城街道':[23.0078, 113.7583]
+    }}
+  }},
+  '江苏省': { center:[32.0603, 118.7969], cities: {
+    '南京市': { center:[32.0603, 118.7969], districts: {
+      '玄武区':[32.0586, 118.7976], '鼓楼区':[32.0625, 118.7784], '江宁区':[31.9517, 118.8283]
+    }},
+    '苏州市': { center:[31.2989, 120.5853], districts: {
+      '姑苏区':[31.3098, 120.5872], '工业园区':[31.3361, 120.6994], '吴中区':[31.2615, 120.6120]
+    }},
+    '无锡市': { center:[31.4912, 120.3119], districts: {
+      '梁溪区':[31.4839, 120.3017], '滨湖区':[31.5028, 120.2138]
+    }}
+  }},
+  '浙江省': { center:[30.2741, 120.1551], cities: {
+    '杭州市': { center:[30.2741, 120.1551], districts: {
+      '上城区':[30.2427, 120.1690], '西湖区':[30.2588, 120.1302], '滨江区':[30.2084, 120.2110], '余杭区':[30.2994, 120.2986]
+    }},
+    '宁波市': { center:[29.8683, 121.5440], districts: {
+      '海曙区':[29.8719, 121.5434], '江北区':[29.8845, 121.5503], '鄞州区':[29.8167, 121.5466]
+    }}
+  }},
+  '四川省': { center:[30.5728, 104.0668], cities: {
+    '成都市': { center:[30.5728, 104.0668], districts: {
+      '锦江区':[30.6566, 104.0909], '武侯区':[30.6417, 104.0431], '高新区':[30.5946, 104.0667], '成华区':[30.6598, 104.1015]
+    }}
+  }},
+  '湖北省': { center:[30.5928, 114.3055], cities: {
+    '武汉市': { center:[30.5928, 114.3055], districts: {
+      '江汉区':[30.6156, 114.2687], '武昌区':[30.5876, 114.3043], '洪山区':[30.5192, 114.3947], '江岸区':[30.6035, 114.2919]
+    }}
+  }},
+  '湖南省': { center:[28.2282, 112.9388], cities: {
+    '长沙市': { center:[28.2282, 112.9388], districts: {
+      '芙蓉区':[28.1957, 112.9931], '岳麓区':[28.2259, 112.9430], '雨花区':[28.1593, 113.0273]
+    }}
+  }},
+  '河南省': { center:[34.7466, 113.6253], cities: {
+    '郑州市': { center:[34.7466, 113.6253], districts: {
+      '金水区':[34.7676, 113.6656], '二七区':[34.7233, 113.6169], '中原区':[34.7489, 113.5815]
+    }},
+    '洛阳市': { center:[34.6200, 112.4536], districts: {
+      '西工区':[34.6691, 112.4346], '涧西区':[34.6593, 112.3829]
+    }}
+  }},
+  '陕西省': { center:[34.3416, 108.9398], cities: {
+    '西安市': { center:[34.3416, 108.9398], districts: {
+      '雁塔区':[34.2203, 108.9470], '碑林区':[34.2519, 108.9606], '未央区':[34.3416, 108.9398]
+    }}
+  }},
+  '山东省': { center:[36.6512, 117.1201], cities: {
+    '济南市': { center:[36.6512, 117.1201], districts: {
+      '历下区':[36.6612, 117.1120], '市中区':[36.6500, 117.0000]
+    }},
+    '青岛市': { center:[36.0671, 120.3826], districts: {
+      '市南区':[36.0626, 120.3831], '市北区':[36.0989, 120.3706], '崂山区':[36.0951, 120.4827]
+    }}
+  }},
+  '福建省': { center:[26.0745, 119.2965], cities: {
+    '福州市': { center:[26.0745, 119.2965], districts: {
+      '鼓楼区':[26.0875, 119.3030], '台江区':[26.0615, 119.3110]
+    }},
+    '厦门市': { center:[24.4798, 118.0894], districts: {
+      '思明区':[24.4600, 118.0950], '湖里区':[24.5200, 118.1400]
+    }}
+  }},
+  '辽宁省': { center:[41.8057, 123.4315], cities: {
+    '沈阳市': { center:[41.8057, 123.4315], districts: {
+      '和平区':[41.7922, 123.3840], '沈河区':[41.7968, 123.4520]
+    }},
+    '大连市': { center:[38.9140, 121.6147], districts: {
+      '中山区':[38.9180, 121.6380], '西岗区':[38.9180, 121.6190]
+    }}
+  }},
+  '天津市': { center:[39.3434, 117.3616], cities: {
+    '天津市': { center:[39.3434, 117.3616], districts: {
+      '和平区':[39.1230, 117.2000], '河西区':[39.1130, 117.2200], '南开区':[39.1330, 117.1800]
+    }}
+  }},
+  '重庆市': { center:[29.5630, 106.5516], cities: {
+    '重庆市': { center:[29.5630, 106.5516], districts: {
+      '渝中区':[29.5600, 106.5700], '江北区':[29.5800, 106.5600], '南岸区':[29.5300, 106.5800]
+    }}
+  }}
+};
 
 // 各城市预设地名 (用于搜索定位)
 const MAP_POIS = {
@@ -3035,51 +3160,100 @@ const MAP_POIS = {
 
 let mapPickerMap = null;
 let mapPickerMarker = null;
+let currentPickerProvince = '上海市';
 let currentPickerCity = '上海市';
-let selectedLocation = { city:'上海市', name:'浦东新区张杨路', lat:31.2284, lng:121.5234 };
+let currentPickerDistrict = '浦东新区';
+let selectedLocation = { province:'上海市', city:'上海市', district:'浦东新区', name:'', lat:31.2217, lng:121.5440 };
 
-function renderCityGrid() {
-  const grid = document.getElementById('cityGrid');
-  grid.innerHTML = '';
-  MAP_CITIES.forEach(c => {
-    const btn = document.createElement('div');
-    btn.className = 'city-item' + (c.name === currentPickerCity ? ' active' : '');
-    btn.textContent = c.name;
-    btn.onclick = () => selectCity(c.name);
-    grid.appendChild(btn);
+// ===== 省 / 市 / 区 三级联动渲染 =====
+function renderRegionColumn(colEl, items, activeName, onPick) {
+  colEl.innerHTML = '';
+  items.forEach(name => {
+    const opt = document.createElement('div');
+    opt.className = 'region-opt' + (name === activeName ? ' active' : '');
+    opt.textContent = name;
+    opt.onclick = () => onPick(name);
+    colEl.appendChild(opt);
   });
+}
+
+function renderProvinceCol() {
+  const col = document.getElementById('regionProvinceCol');
+  renderRegionColumn(col, Object.keys(REGION_DATA), currentPickerProvince, pickProvince);
+  renderCityCol();
+}
+
+function renderCityCol() {
+  const col = document.getElementById('regionCityCol');
+  const cities = REGION_DATA[currentPickerProvince] ? Object.keys(REGION_DATA[currentPickerProvince].cities) : [];
+  if (!cities.includes(currentPickerCity)) currentPickerCity = cities[0];
+  renderRegionColumn(col, cities, currentPickerCity, pickCity);
+  renderDistrictCol();
+}
+
+function renderDistrictCol() {
+  const col = document.getElementById('regionDistrictCol');
+  const city = REGION_DATA[currentPickerProvince] && REGION_DATA[currentPickerProvince].cities[currentPickerCity];
+  const districts = city ? Object.keys(city.districts) : [];
+  if (!districts.includes(currentPickerDistrict)) currentPickerDistrict = districts[0];
+  renderRegionColumn(col, districts, currentPickerDistrict, pickDistrict);
+}
+
+function pickProvince(p) {
+  currentPickerProvince = p;
+  currentPickerCity = Object.keys(REGION_DATA[p].cities)[0];
+  const city = REGION_DATA[p].cities[currentPickerCity];
+  currentPickerDistrict = Object.keys(city.districts)[0];
+  renderProvinceCol();
+  applyRegionToMap();
+}
+
+function pickCity(c) {
+  currentPickerCity = c;
+  const city = REGION_DATA[currentPickerProvince].cities[c];
+  currentPickerDistrict = Object.keys(city.districts)[0];
+  renderCityCol();
+  applyRegionToMap();
+}
+
+function pickDistrict(d) {
+  currentPickerDistrict = d;
+  renderDistrictCol();
+  applyRegionToMap();
+}
+
+function applyRegionToMap() {
+  const city = REGION_DATA[currentPickerProvince].cities[currentPickerCity];
+  const coord = city.districts[currentPickerDistrict];
+  document.getElementById('pickerCityName').textContent = currentPickerProvince + ' · ' + currentPickerCity + ' · ' + currentPickerDistrict;
+  selectedLocation = { province:currentPickerProvince, city:currentPickerCity, district:currentPickerDistrict, name:'', lat:coord[0], lng:coord[1] };
+  updateSelectedText();
+  if (mapPickerMap) {
+    mapPickerMap.setView(coord, 14);
+    addOrMoveMarker(coord);
+  }
+  document.getElementById('mapSearchInput').value = '';
+  document.getElementById('mapSearchResults').style.display = 'none';
 }
 
 function toggleCityList() {
   const panel = document.getElementById('cityPanel');
   const arrow = document.getElementById('cityArrow');
   const open = panel.style.display !== 'none';
-  panel.style.display = open ? 'none' : 'block';
-  arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-
-function selectCity(cityName) {
-  currentPickerCity = cityName;
-  const city = MAP_CITIES.find(c => c.name === cityName);
-  document.getElementById('pickerCityName').textContent = cityName;
-  document.getElementById('cityPanel').style.display = 'none';
-  document.getElementById('cityArrow').style.transform = 'rotate(0deg)';
-  renderCityGrid();
-  selectedLocation = { city:cityName, name:'', lat:city.center[0], lng:city.center[1] };
-  updateSelectedText();
-  if (mapPickerMap) {
-    mapPickerMap.setView(city.center, city.zoom);
-    addOrMoveMarker(city.center);
+  if (open) {
+    panel.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    panel.style.display = 'block';
+    arrow.style.transform = 'rotate(180deg)';
+    renderProvinceCol();
   }
-  document.getElementById('mapSearchInput').value = '';
-  document.getElementById('mapSearchResults').style.display = 'none';
 }
 
 function showMapPicker() {
   pageHistory.push(currentPage);
   showPage('mapPicker');
-  renderCityGrid();
-  document.getElementById('pickerCityName').textContent = currentPickerCity;
+  document.getElementById('pickerCityName').textContent = currentPickerProvince + ' · ' + currentPickerCity + ' · ' + currentPickerDistrict;
   setTimeout(() => initMapPicker(), 200);
 }
 
@@ -3089,9 +3263,9 @@ function initMapPicker() {
     container.innerHTML = '<div style="padding:50px 20px;text-align:center;color:#999;font-size:14px;">地图组件加载失败<br>请检查网络后重试</div>';
     return;
   }
+  const coord = REGION_DATA[currentPickerProvince].cities[currentPickerCity].districts[currentPickerDistrict];
   if (!mapPickerMap) {
-    const city = MAP_CITIES.find(c => c.name === currentPickerCity);
-    mapPickerMap = L.map('mapContainer').setView(city.center, city.zoom);
+    mapPickerMap = L.map('mapContainer').setView(coord, 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap',
       maxZoom: 19
@@ -3107,9 +3281,8 @@ function initMapPicker() {
   } else {
     mapPickerMap.invalidateSize();
   }
-  const city = MAP_CITIES.find(c => c.name === currentPickerCity);
-  mapPickerMap.setView(city.center, city.zoom);
-  addOrMoveMarker([selectedLocation.lat, selectedLocation.lng]);
+  mapPickerMap.setView(coord, 14);
+  addOrMoveMarker(coord);
 }
 
 function addOrMoveMarker(coord) {
@@ -3129,9 +3302,8 @@ function addOrMoveMarker(coord) {
 }
 
 function updateSelectedText() {
-  const txt = selectedLocation.name
-    ? selectedLocation.city + '·' + selectedLocation.name
-    : selectedLocation.city + '市中心';
+  const region = selectedLocation.province + '·' + selectedLocation.city + '·' + selectedLocation.district;
+  const txt = selectedLocation.name ? region + ' ' + selectedLocation.name : region;
   document.getElementById('mapSelectedText').textContent = txt;
 }
 
@@ -3153,7 +3325,7 @@ function searchMapPlaces(keyword) {
   list.forEach(p => {
     const item = document.createElement('div');
     item.className = 'map-search-item';
-    item.innerHTML = '<span>📍 ' + p.name + '</span><span style="color:#999;font-size:12px;">' + currentPickerCity + '</span>';
+    item.innerHTML = '<span>📍 ' + p.name + '</span><span style="color:#999;font-size:12px;">' + currentPickerProvince + '·' + currentPickerCity + '</span>';
     item.onclick = () => {
       selectedLocation.name = p.name;
       selectedLocation.lat = p.coord[0];
@@ -3172,9 +3344,8 @@ function searchMapPlaces(keyword) {
 }
 
 function confirmLocation() {
-  const addr = selectedLocation.name
-    ? selectedLocation.city + '·' + selectedLocation.name
-    : selectedLocation.city + '市中心';
+  const region = selectedLocation.province + '·' + selectedLocation.city + '·' + selectedLocation.district;
+  const addr = selectedLocation.name ? region + ' ' + selectedLocation.name : region;
   document.getElementById('locText').textContent = addr;
   showToast('已更新定位：' + addr);
   goBack();
@@ -3186,8 +3357,8 @@ function refreshLocation() {
   btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
   showToast('正在获取您的位置…');
   setTimeout(() => {
-    document.getElementById('locText').textContent = '上海市浦东新区张杨路';
-    selectedLocation = { city:'上海市', name:'浦东新区张杨路', lat:31.2284, lng:121.5234 };
+    document.getElementById('locText').textContent = '上海市·浦东新区张杨路';
+    selectedLocation = { province:'上海市', city:'上海市', district:'浦东新区', name:'张杨路', lat:31.2284, lng:121.5234 };
     btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
     showToast('已更新您的位置');
   }, 1000);
