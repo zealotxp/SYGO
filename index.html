@@ -402,6 +402,34 @@
     gap: 2px;
   }
 
+  /* ===== Featured Category Tabs ===== */
+  .featured-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .featured-tabs::-webkit-scrollbar { display: none; }
+  .featured-tab {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: var(--white);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .featured-tab.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+    font-weight: 600;
+  }
+
   /* ===== Drug Card ===== */
   .drug-grid {
     display: grid;
@@ -419,11 +447,11 @@
   }
   .drug-card:active { transform: scale(0.97); }
   .drug-card-img {
-    height: 140px;
+    height: 104px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    font-size: 32px;
     background: #fff;
     overflow: hidden;
   }
@@ -431,11 +459,11 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 8px;
+    padding: 6px;
   }
-  .drug-card-info { padding: 10px 12px; }
+  .drug-card-info { padding: 8px 10px; }
   .drug-card-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text);
     white-space: nowrap;
@@ -443,24 +471,27 @@
     text-overflow: ellipsis;
   }
   .drug-card-spec {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text-secondary);
     margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .drug-card-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 6px;
+    margin-top: 5px;
   }
   .drug-card-price {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--red);
   }
-  .drug-card-price .yen { font-size: 11px; }
+  .drug-card-price .yen { font-size: 10px; }
   .drug-card-stock {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--primary);
     background: var(--primary-light);
     padding: 2px 6px;
@@ -1764,52 +1795,8 @@
       <div class="section-title">主推药品</div>
       <div class="section-more" onclick="goAllDrugs()">查看更多 ›</div>
     </div>
-    <div class="drug-grid">
-      <div class="drug-card" onclick="goDrugDetail(1)">
-        <div class="drug-card-img"><img src="images/drug1.jpg" alt="静注人免疫球蛋白"></div>
-        <div class="drug-card-info">
-          <div class="drug-card-name">静注人免疫球蛋白(pH4)</div>
-          <div class="drug-card-spec">武汉中原瑞德 · 2.5g/50ml</div>
-          <div class="drug-card-bottom">
-            <div class="drug-card-price"><span class="yen">¥</span>--</div>
-            <div class="drug-card-stock">3家在售</div>
-          </div>
-        </div>
-      </div>
-      <div class="drug-card" onclick="goDrugDetail(2)">
-        <div class="drug-card-img"><img src="images/drug2.jpg" alt="静注人免疫球蛋白"></div>
-        <div class="drug-card-info">
-          <div class="drug-card-name">静注人免疫球蛋白(pH4)</div>
-          <div class="drug-card-spec">四川远大蜀阳 · 2.5g</div>
-          <div class="drug-card-bottom">
-            <div class="drug-card-price"><span class="yen">¥</span>--</div>
-            <div class="drug-card-stock">2家在售</div>
-          </div>
-        </div>
-      </div>
-      <div class="drug-card" onclick="goDrugDetail(3)">
-        <div class="drug-card-img"><img src="images/drug3.jpg" alt="人血白蛋白"></div>
-        <div class="drug-card-info">
-          <div class="drug-card-name">人血白蛋白</div>
-          <div class="drug-card-spec">瑞士杰特贝林 · 10g(20% 50ml)</div>
-          <div class="drug-card-bottom">
-            <div class="drug-card-price"><span class="yen">¥</span>--</div>
-            <div class="drug-card-stock">4家在售</div>
-          </div>
-        </div>
-      </div>
-      <div class="drug-card" onclick="goDrugDetail(4)">
-        <div class="drug-card-img"><img src="images/drug4.jpg" alt="人血白蛋白"></div>
-        <div class="drug-card-info">
-          <div class="drug-card-name">人血白蛋白</div>
-          <div class="drug-card-spec">山东泰邦生物 · 10g(20% 50ml)</div>
-          <div class="drug-card-bottom">
-            <div class="drug-card-price"><span class="yen">¥</span>--</div>
-            <div class="drug-card-stock">3家在售</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="featured-tabs" id="featuredTabs"></div>
+    <div class="drug-grid" id="featuredDrugGrid"></div>
 
     <!-- Nearby Merchants -->
     <div class="section-header">
@@ -3528,6 +3515,80 @@ function filterMerchants(el, category) {
   }
 }
 
+/* ===== Home Featured Drugs: category TAB + dynamic grid ===== */
+const CATEGORY_LABELS = {
+  immunoglobulin: '免疫球蛋白',
+  albumin: '人血白蛋白',
+  factor: '凝血因子',
+  vaccine: '疫苗制品'
+};
+const FEATURED_TAB_ORDER = ['immunoglobulin', 'albumin', 'factor', 'vaccine'];
+let currentFeaturedCategory = 'all';
+
+function getFeaturedCategoryList() {
+  const present = [];
+  FEATURED_TAB_ORDER.forEach(c => {
+    if (drugsData.some(d => d.category === c)) present.push(c);
+  });
+  return [{ key: 'all', label: '全部' }].concat(
+    present.map(c => ({ key: c, label: CATEGORY_LABELS[c] || c }))
+  );
+}
+
+function renderFeaturedTabs() {
+  const box = document.getElementById('featuredTabs');
+  if (!box) return;
+  box.innerHTML = '';
+  getFeaturedCategoryList().forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'featured-tab' + (t.key === currentFeaturedCategory ? ' active' : '');
+    el.textContent = t.label;
+    el.onclick = () => switchFeaturedTab(t.key);
+    box.appendChild(el);
+  });
+}
+
+function switchFeaturedTab(category) {
+  if (category === currentFeaturedCategory) return;
+  currentFeaturedCategory = category;
+  renderFeaturedTabs();
+  renderFeaturedDrugs();
+}
+
+function renderFeaturedDrugs() {
+  const grid = document.getElementById('featuredDrugGrid');
+  if (!grid) return;
+  const list = currentFeaturedCategory === 'all'
+    ? drugsData
+    : drugsData.filter(d => d.category === currentFeaturedCategory);
+  grid.innerHTML = '';
+  list.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'drug-card';
+    card.setAttribute('onclick', 'goDrugDetail(' + d.id + ')');
+    const bg = d.img ? '#fff' : (d.emojiBg || 'var(--primary-light)');
+    const imgHtml = d.img
+      ? '<img src="' + d.img + '" alt="' + d.name + '">'
+      : '<div style="font-size:34px;">' + (d.emoji || '💊') + '</div>';
+    card.innerHTML =
+      '<div class="drug-card-img" style="background:' + bg + ';">' + imgHtml + '</div>' +
+      '<div class="drug-card-info">' +
+        '<div class="drug-card-name">' + d.name + '</div>' +
+        '<div class="drug-card-spec">' + d.spec + (d.spec2 ? ' · ' + d.spec2 : '') + '</div>' +
+        '<div class="drug-card-bottom">' +
+          '<div class="drug-card-price"><span class="yen">¥</span>--</div>' +
+          '<div class="drug-card-stock">' + d.stock + '</div>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function initFeaturedSection() {
+  renderFeaturedTabs();
+  renderFeaturedDrugs();
+}
+
 function goDrugDetail(id) {
   currentDrugId = id;
   const drug = drugsData.find(d => d.id === id) || drugsData[0];
@@ -3927,6 +3988,7 @@ function cancelSearch() {
 document.addEventListener('DOMContentLoaded', () => {
   initSwiper();
   initDateSelector();
+  initFeaturedSection();
   // Show location permission on first visit
   setTimeout(() => showLocationModal(), 1000);
 });
