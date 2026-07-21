@@ -2562,6 +2562,16 @@
         <input class="form-input" type="text" placeholder="请选择预约药品" id="appointDrug" value="静注人免疫球蛋白(pH4) 2.5g/50ml" readonly>
       </div>
 
+      <!-- Quantity -->
+      <div class="form-group">
+        <div class="form-label">药品数量 <span class="required">*</span></div>
+        <div class="qty-stepper">
+          <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-value" id="appointQty">1</span>
+          <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
       <!-- Date Selection -->
       <div class="form-group">
         <div class="form-label">预约日期 <span class="required">*</span></div>
@@ -2588,16 +2598,6 @@
       <div class="form-group">
         <div class="form-label">预约商家 <span class="required">*</span></div>
         <input class="form-input" type="text" placeholder="请选择商家" id="appointMerchant" value="仁济诊所(浦东店)" readonly>
-      </div>
-
-      <!-- Quantity -->
-      <div class="form-group">
-        <div class="form-label">药品数量 <span class="required">*</span></div>
-        <div class="qty-stepper">
-          <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
-          <span class="qty-value" id="appointQty">1</span>
-          <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
-        </div>
       </div>
 
       <!-- Name -->
