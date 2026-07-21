@@ -1506,17 +1506,16 @@ function renderMerchantProducts() {
     const min = (PRODUCT_PRICE_MAP[d.id] || { min: 0 }).min;
     const suggested = (PRODUCT_PRICE_MAP[d.id] || { suggested: 0 }).suggested;
     const sel = merchantProductSelected.includes(d.id);
-    const priceHtml = PLATFORM_SETTINGS.priceVisible
-      ? `<div class="m-prod-price"><div class="m-prod-price-row"><span>本店售价</span><input class="m-prod-price-input" type="number" id="price-${d.id}" value="${on ? price : suggested}" ${on ? '' : 'disabled'} onchange="onMerchantPriceChange(${d.id})"></div><div class="m-prod-min">平台最低限价：¥${min}（低于不可保存）</div></div>`
-      : `<div class="m-prod-price"><div class="m-prod-min">平台设置：本店价格暂不展示</div></div>`;
+    const priceHtml = (PLATFORM_SETTINGS.priceVisible && on)
+      ? `<div class="m-prod-price"><span>售价</span><input class="m-prod-price-input" type="number" id="price-${d.id}" value="${price}" onchange="onMerchantPriceChange(${d.id})"><span class="m-prod-min">限¥${min}</span></div>`
+      : '';
     return `
       <div class="m-prod-item ${on ? 'on' : ''}">
         <label class="m-prod-check"><input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleMerchantProductSelect(${d.id}, this.checked)"></label>
         <div class="m-prod-icon">${d.emoji || '💊'}</div>
         <div class="m-prod-info">
           <div class="m-prod-name">${escHtml(d.name)}</div>
-          <div class="m-prod-spec">${escHtml(d.spec || '')} · ${escHtml(d.spec2 || '')}</div>
-          <div class="m-prod-cat">${MERCHANT_CATEGORY_LABELS[d.category] || d.category}</div>
+          <div class="m-prod-sub"><span class="m-prod-spec">${escHtml(d.spec || '')} · ${escHtml(d.spec2 || '')}</span><span class="m-prod-cat">${MERCHANT_CATEGORY_LABELS[d.category] || d.category}</span></div>
           ${priceHtml}
         </div>
         <div class="m-prod-action"><button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button></div>
