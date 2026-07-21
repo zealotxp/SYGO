@@ -168,6 +168,123 @@
   .location-bar svg { width: 14px; height: 14px; }
   .location-bar .loc-text { flex: 1; }
   .location-bar .change-loc { opacity: 0.8; text-decoration: underline; }
+  .location-bar .loc-actions { display: flex; gap: 6px; }
+  .location-bar .loc-btn {
+    background: rgba(255,255,255,0.22);
+    border: none;
+    color: white;
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .location-bar .loc-btn:active { background: rgba(255,255,255,0.4); }
+
+  /* ===== Map Picker Page (手动定位) ===== */
+  #mapPickerPage { display: none; flex-direction: column; }
+  #mapPickerPage.active { display: flex; flex-direction: column; height: 100%; }
+  .map-picker-nav {
+    height: 48px;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+  .map-picker-title { font-size: 17px; font-weight: 600; }
+  .city-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 11px 16px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .city-current { font-size: 15px; font-weight: 600; color: var(--text); }
+  .city-arrow { width: 16px; height: 16px; transition: transform 0.2s; }
+  .city-panel {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+  .city-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .city-item {
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: var(--bg);
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .city-item.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); font-weight: 600; }
+  .map-search-wrap { position: relative; padding: 10px 16px; background: var(--white); flex-shrink: 0; }
+  .map-search-icon { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; }
+  .map-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg);
+    outline: none;
+  }
+  .map-search-input:focus { border-color: var(--primary); }
+  .map-search-results {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 58px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 200;
+  }
+  .map-search-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .map-search-item:last-child { border-bottom: none; }
+  .map-search-item:active { background: var(--bg); }
+  .map-search-empty { padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+  .map-container { flex: 1; width: 100%; min-height: 300px; background: #e5e3df; }
+  .map-tip { text-align: center; font-size: 12px; color: var(--text-secondary); padding: 8px; background: var(--bg); flex-shrink: 0; }
+  .map-confirm-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    flex-shrink: 0;
+  }
+  .map-selected { flex: 1; min-width: 0; }
+  .map-selected-label { font-size: 12px; color: var(--text-secondary); }
+  .map-selected-text { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .map-confirm-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .map-confirm-btn:active { background: var(--primary-dark); }
 
   /* ===== Swiper ===== */
   .swiper-section { padding: 12px 16px 0; }
@@ -1476,6 +1593,9 @@
     line-height: 2;
   }
 </style>
+  <!-- Leaflet 地图库 (免费开源, 用于手动定位地图选点) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 </head>
 <body>
 
@@ -1582,10 +1702,13 @@
     </div>
 
     <!-- Location -->
-    <div class="location-bar" id="locationBar" onclick="showLocationModal()">
+    <div class="location-bar" id="locationBar">
       <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-      <span class="loc-text" id="locText">定位中...</span>
-      <span class="change-loc">切换</span>
+      <span class="loc-text" id="locText" onclick="showLocationModal()">定位中...</span>
+      <div class="loc-actions">
+        <button class="loc-btn" onclick="refreshLocation()">🔄 刷新</button>
+        <button class="loc-btn" onclick="showMapPicker()">📍 手动</button>
+      </div>
     </div>
 
     <!-- Swiper -->
@@ -2683,6 +2806,46 @@
     </div>
   </div>
 
+  <!-- ========== Map Picker Page (手动定位) ========== -->
+  <div class="page" id="mapPickerPage">
+    <div class="map-picker-nav">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <span class="map-picker-title">选择位置</span>
+      <span style="width:24px;"></span>
+    </div>
+
+    <!-- 城市选择 -->
+    <div class="city-bar" onclick="toggleCityList()">
+      <span class="city-current" id="pickerCityName">上海市</span>
+      <svg class="city-arrow" id="cityArrow" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="city-panel" id="cityPanel" style="display:none;">
+      <div class="city-grid" id="cityGrid"></div>
+    </div>
+
+    <!-- 地名搜索 -->
+    <div class="map-search-wrap">
+      <svg class="map-search-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="mapSearchInput" class="map-search-input" placeholder="输入地名搜索，如 人民广场" oninput="searchMapPlaces(this.value)">
+      <div class="map-search-results" id="mapSearchResults" style="display:none;"></div>
+    </div>
+
+    <!-- 地图 -->
+    <div class="map-container" id="mapContainer"></div>
+    <div class="map-tip">点击地图任意位置可手动选点，或拖动标记微调</div>
+
+    <!-- 确认栏 -->
+    <div class="map-confirm-bar">
+      <div class="map-selected">
+        <div class="map-selected-label">已选位置</div>
+        <div class="map-selected-text" id="mapSelectedText">请在地图上选择位置</div>
+      </div>
+      <button class="map-confirm-btn" onclick="confirmLocation()">确定</button>
+    </div>
+  </div>
+
   <!-- ========== Tab Bar ========== -->
   <div class="tab-bar" id="tabBar">
     <div class="tab-item active" onclick="switchTab('home')">
@@ -2786,6 +2949,248 @@ function allowLocation() {
 function denyLocation() {
   document.getElementById('locationModal').classList.remove('show');
   document.getElementById('locText').textContent = '未获取定位 · 点击选择';
+}
+
+// ===== 手动定位：地图选点 =====
+const MAP_CITIES = [
+  { name:'上海市', center:[31.2304, 121.4737], zoom:12 },
+  { name:'北京市', center:[39.9042, 116.4074], zoom:11 },
+  { name:'广州市', center:[23.1291, 113.2644], zoom:12 },
+  { name:'深圳市', center:[22.5431, 114.0579], zoom:12 },
+  { name:'杭州市', center:[30.2741, 120.1551], zoom:12 },
+  { name:'成都市', center:[30.5728, 104.0668], zoom:12 },
+  { name:'南京市', center:[32.0603, 118.7969], zoom:12 },
+  { name:'武汉市', center:[30.5928, 114.3055], zoom:12 },
+  { name:'重庆市', center:[29.5630, 106.5516], zoom:12 },
+  { name:'西安市', center:[34.3416, 108.9398], zoom:12 }
+];
+
+// 各城市预设地名 (用于搜索定位)
+const MAP_POIS = {
+  '上海市': [
+    { name:'人民广场', coord:[31.2304, 121.4737] },
+    { name:'陆家嘴', coord:[31.2397, 121.4998] },
+    { name:'徐家汇', coord:[31.1951, 121.4371] },
+    { name:'静安寺', coord:[31.2240, 121.4453] },
+    { name:'五角场', coord:[31.3037, 121.5158] },
+    { name:'世纪公园', coord:[31.2186, 121.5500] },
+    { name:'浦东新区张杨路', coord:[31.2284, 121.5234] }
+  ],
+  '北京市': [
+    { name:'天安门广场', coord:[39.9055, 116.3976] },
+    { name:'王府井', coord:[39.9149, 116.4109] },
+    { name:'中关村', coord:[39.9836, 116.3164] },
+    { name:'三里屯', coord:[39.9367, 116.4554] },
+    { name:'西单', coord:[39.9075, 116.3739] }
+  ],
+  '广州市': [
+    { name:'广州塔', coord:[23.1066, 113.3245] },
+    { name:'北京路', coord:[23.1290, 113.2677] },
+    { name:'天河体育中心', coord:[23.1413, 113.3230] },
+    { name:'珠江新城', coord:[23.1190, 113.3232] }
+  ],
+  '深圳市': [
+    { name:'华强北', coord:[22.5446, 114.0857] },
+    { name:'深圳湾', coord:[22.5055, 113.9375] },
+    { name:'东门老街', coord:[22.5470, 114.1230] },
+    { name:'福田中心', coord:[22.5410, 114.0570] }
+  ],
+  '杭州市': [
+    { name:'西湖', coord:[30.2592, 120.1490] },
+    { name:'武林广场', coord:[30.2741, 120.1630] },
+    { name:'钱江新城', coord:[30.2470, 120.2110] },
+    { name:'杭州东站', coord:[30.2900, 120.2120] }
+  ],
+  '成都市': [
+    { name:'春熙路', coord:[30.6530, 104.0810] },
+    { name:'宽窄巷子', coord:[30.6690, 104.0560] },
+    { name:'天府广场', coord:[30.6570, 104.0660] },
+    { name:'高新南区', coord:[30.5500, 104.0670] }
+  ],
+  '南京市': [
+    { name:'新街口', coord:[32.0430, 118.7900] },
+    { name:'夫子庙', coord:[32.0210, 118.7900] },
+    { name:'玄武湖', coord:[32.0680, 118.7970] },
+    { name:'河西万达', coord:[32.0400, 118.7450] }
+  ],
+  '武汉市': [
+    { name:'江汉路', coord:[30.5820, 114.2840] },
+    { name:'光谷广场', coord:[30.5060, 114.3990] },
+    { name:'黄鹤楼', coord:[30.5460, 114.3060] },
+    { name:'武汉天地', coord:[30.6060, 114.3120] }
+  ],
+  '重庆市': [
+    { name:'解放碑', coord:[29.5640, 106.5780] },
+    { name:'洪崖洞', coord:[29.5630, 106.5780] },
+    { name:'观音桥', coord:[29.5750, 106.5400] },
+    { name:'南坪', coord:[29.5300, 106.5700] }
+  ],
+  '西安市': [
+    { name:'钟楼', coord:[34.2610, 108.9480] },
+    { name:'大雁塔', coord:[34.2180, 108.9640] },
+    { name:'小寨', coord:[34.2250, 108.9420] },
+    { name:'高新路', coord:[34.2400, 108.9150] }
+  ]
+};
+
+let mapPickerMap = null;
+let mapPickerMarker = null;
+let currentPickerCity = '上海市';
+let selectedLocation = { city:'上海市', name:'浦东新区张杨路', lat:31.2284, lng:121.5234 };
+
+function renderCityGrid() {
+  const grid = document.getElementById('cityGrid');
+  grid.innerHTML = '';
+  MAP_CITIES.forEach(c => {
+    const btn = document.createElement('div');
+    btn.className = 'city-item' + (c.name === currentPickerCity ? ' active' : '');
+    btn.textContent = c.name;
+    btn.onclick = () => selectCity(c.name);
+    grid.appendChild(btn);
+  });
+}
+
+function toggleCityList() {
+  const panel = document.getElementById('cityPanel');
+  const arrow = document.getElementById('cityArrow');
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+function selectCity(cityName) {
+  currentPickerCity = cityName;
+  const city = MAP_CITIES.find(c => c.name === cityName);
+  document.getElementById('pickerCityName').textContent = cityName;
+  document.getElementById('cityPanel').style.display = 'none';
+  document.getElementById('cityArrow').style.transform = 'rotate(0deg)';
+  renderCityGrid();
+  selectedLocation = { city:cityName, name:'', lat:city.center[0], lng:city.center[1] };
+  updateSelectedText();
+  if (mapPickerMap) {
+    mapPickerMap.setView(city.center, city.zoom);
+    addOrMoveMarker(city.center);
+  }
+  document.getElementById('mapSearchInput').value = '';
+  document.getElementById('mapSearchResults').style.display = 'none';
+}
+
+function showMapPicker() {
+  pageHistory.push(currentPage);
+  showPage('mapPicker');
+  renderCityGrid();
+  document.getElementById('pickerCityName').textContent = currentPickerCity;
+  setTimeout(() => initMapPicker(), 200);
+}
+
+function initMapPicker() {
+  const container = document.getElementById('mapContainer');
+  if (!window.L) {
+    container.innerHTML = '<div style="padding:50px 20px;text-align:center;color:#999;font-size:14px;">地图组件加载失败<br>请检查网络后重试</div>';
+    return;
+  }
+  if (!mapPickerMap) {
+    const city = MAP_CITIES.find(c => c.name === currentPickerCity);
+    mapPickerMap = L.map('mapContainer').setView(city.center, city.zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(mapPickerMap);
+    mapPickerMap.on('click', function(e) {
+      const ll = [e.latlng.lat, e.latlng.lng];
+      addOrMoveMarker(ll);
+      selectedLocation.lat = ll[0];
+      selectedLocation.lng = ll[1];
+      selectedLocation.name = '';
+      updateSelectedText();
+    });
+  } else {
+    mapPickerMap.invalidateSize();
+  }
+  const city = MAP_CITIES.find(c => c.name === currentPickerCity);
+  mapPickerMap.setView(city.center, city.zoom);
+  addOrMoveMarker([selectedLocation.lat, selectedLocation.lng]);
+}
+
+function addOrMoveMarker(coord) {
+  if (!mapPickerMap) return;
+  if (mapPickerMarker) {
+    mapPickerMarker.setLatLng(coord);
+  } else {
+    mapPickerMarker = L.marker(coord, { draggable:true }).addTo(mapPickerMap);
+    mapPickerMarker.on('dragend', function(e) {
+      const p = e.target.getLatLng();
+      selectedLocation.lat = p.lat;
+      selectedLocation.lng = p.lng;
+      selectedLocation.name = '';
+      updateSelectedText();
+    });
+  }
+}
+
+function updateSelectedText() {
+  const txt = selectedLocation.name
+    ? selectedLocation.city + '·' + selectedLocation.name
+    : selectedLocation.city + '市中心';
+  document.getElementById('mapSelectedText').textContent = txt;
+}
+
+function searchMapPlaces(keyword) {
+  const box = document.getElementById('mapSearchResults');
+  const kw = (keyword || '').trim();
+  if (kw === '') {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+  const list = (MAP_POIS[currentPickerCity] || []).filter(p => p.name.indexOf(kw) !== -1);
+  if (list.length === 0) {
+    box.innerHTML = '<div class="map-search-empty">未找到相关地点</div>';
+    box.style.display = 'block';
+    return;
+  }
+  box.innerHTML = '';
+  list.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'map-search-item';
+    item.innerHTML = '<span>📍 ' + p.name + '</span><span style="color:#999;font-size:12px;">' + currentPickerCity + '</span>';
+    item.onclick = () => {
+      selectedLocation.name = p.name;
+      selectedLocation.lat = p.coord[0];
+      selectedLocation.lng = p.coord[1];
+      if (mapPickerMap) {
+        mapPickerMap.setView(p.coord, 15);
+        addOrMoveMarker(p.coord);
+      }
+      updateSelectedText();
+      document.getElementById('mapSearchInput').value = p.name;
+      box.style.display = 'none';
+    };
+    box.appendChild(item);
+  });
+  box.style.display = 'block';
+}
+
+function confirmLocation() {
+  const addr = selectedLocation.name
+    ? selectedLocation.city + '·' + selectedLocation.name
+    : selectedLocation.city + '市中心';
+  document.getElementById('locText').textContent = addr;
+  showToast('已更新定位：' + addr);
+  goBack();
+}
+
+// ===== 刷新定位 =====
+function refreshLocation() {
+  const btns = document.querySelectorAll('.loc-btn');
+  btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+  showToast('正在获取您的位置…');
+  setTimeout(() => {
+    document.getElementById('locText').textContent = '上海市浦东新区张杨路';
+    selectedLocation = { city:'上海市', name:'浦东新区张杨路', lat:31.2284, lng:121.5234 };
+    btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+    showToast('已更新您的位置');
+  }, 1000);
 }
 
 // ===== Navigation =====
