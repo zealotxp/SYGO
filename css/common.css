@@ -1026,6 +1026,9 @@
   .status-pending { background: var(--orange-light); color: var(--orange); }
   .status-arrived { background: var(--primary-light); color: var(--primary); }
   .status-cancelled { background: #F5F5F5; color: #999; }
+  .status-success { background: #E8F8EE; color: #18A058; }
+  .appointment-item-qty { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .empty-tip { text-align: center; color: var(--text-secondary); padding: 48px 0; font-size: 14px; }
   .appointment-item-body {
     display: flex;
     gap: 10px;

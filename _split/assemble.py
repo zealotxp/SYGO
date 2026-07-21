@@ -35,7 +35,7 @@ PAGES = [
     ('drug-detail.html', 'drugDetailPage', '药品详情 - 上药GO', 'drug-detail', False, None, ['qrModal','toast'], False, ('onclick="goAppointment()"', 'onclick="goAppointmentForDrug()"')),
     ('merchant-detail.html', 'merchantDetailPage', '商家详情 - 上药GO', 'merchant-detail', False, None, ['qrModal','toast','imagePreviewModal'], False, None),
     ('appointment.html', 'appointmentPage', '预约购药 - 上药GO', 'appointment', False, None, ['successModal','merchantPicker','toast'], False, None),
-    ('my-appointments.html', 'myAppointmentsPage', '我的预约 - 上药GO', 'my-appointments', True, 'myAppointments', ['verifyModal','cancelConfirmModal','toast'], False, None),
+    ('my-appointments.html', 'myAppointmentsPage', '我的预约 - 上药GO', 'my-appointments', True, 'myAppointments', ['toast'], False, None),
     ('profile.html', 'profilePage', '我的 - 上药GO', 'profile', True, 'profile', ['qrModal','toast'], False, None),
     ('about.html', 'aboutPage', '关于我们 - 上药GO', 'about', False, None, ['toast'], False, None),
     ('privacy.html', 'privacyPage', '隐私政策 - 上药GO', 'privacy', False, None, ['toast'], False, None),

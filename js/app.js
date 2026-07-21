@@ -942,7 +942,30 @@ function submitAppointment() {
 
   if (hasError) return;
 
+  const drug = drugsData.find(x => x.id === currentDrugId);
+  const merchant = merchantsData.find(x => x.id === currentMerchantId);
+  const dateItem = document.querySelector('.date-item.selected');
+  const dateText = dateItem ? (dateItem.querySelector('.weekday').textContent + ' ' + dateItem.querySelector('.day').textContent) : '';
+  const timeText = selectedTime ? selectedTime.textContent.trim() : '';
+  const time = (dateText + ' ' + timeText).trim() || '待定';
+
   const orderNo = 'YY' + Date.now().toString().slice(-10);
+  const appointment = {
+    orderNo: orderNo,
+    drugName: drug ? drug.name : document.getElementById('appointDrug').value,
+    drugSpec: drug ? (drug.spec2 || '') : '',
+    img: (drug && drug.img) ? drug.img : 'images/drug1.jpg',
+    merchantName: merchant ? merchant.name : (document.getElementById('appointMerchantText') ? document.getElementById('appointMerchantText').textContent : ''),
+    time: time,
+    qty: qty,
+    status: 'success',
+    createdAt: Date.now()
+  };
+  let list = getMyAppointments();
+  if (!list) { seedAppointments(); list = getMyAppointments() || []; }
+  list.push(appointment);
+  saveMyAppointments(list);
+
   document.getElementById('successDetail').innerHTML = `
     您的预约已提交成功！<br>预约单号：<span style="color:var(--primary);font-weight:600;">${orderNo}</span><br>药品数量：${qty} 份<br>请按时到店核销
   `;
@@ -969,69 +992,69 @@ function closeSuccessModal() {
   location.href = 'index.html';
 }
 
-// ===== Appointment Filters =====
-function filterAppointments(el, type) {
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  const items = document.querySelectorAll('.appointment-item');
-  items.forEach(item => {
-    const status = item.getAttribute('data-status');
-    if (type === 'all' || status === type) {
-      item.style.display = '';
-    } else {
-      item.style.display = 'none';
-    }
-  });
+// ===== My Appointments (dynamic list, no status lifecycle) =====
+const APPOINTMENTS_KEY = 'sygo_appointments';
+
+function getMyAppointments() {
+  try {
+    const raw = localStorage.getItem(APPOINTMENTS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
 }
 
-// ===== Cancel Appointment =====
-let cancelTargetBtn = null;
-
-function cancelAppointment(btn) {
-  cancelTargetBtn = btn;
-  document.getElementById('cancelConfirmModal').classList.add('show');
+function saveMyAppointments(list) {
+  try { localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(list)); } catch (e) {}
 }
 
-function closeCancelModal() {
-  document.getElementById('cancelConfirmModal').classList.remove('show');
-  cancelTargetBtn = null;
+function seedAppointments() {
+  const seed = [
+    { orderNo: 'YY20260522001', drugName: '静注人免疫球蛋白(pH4)', drugSpec: '2.5g/50ml', img: 'images/drug1.jpg', merchantName: '仁济诊所(浦东店)', time: '今天 21 14:00', qty: 2, status: 'success', createdAt: Date.now() - 300000 },
+    { orderNo: 'YY20260521003', drugName: '人血白蛋白(安博灵)', drugSpec: '10g/50ml', img: 'images/drug3.jpg', merchantName: '国大诊所(徐汇店)', time: '昨天 20 10:00', qty: 1, status: 'success', createdAt: Date.now() - 600000 },
+    { orderNo: 'YY20260519005', drugName: '人血白蛋白(蜀阳)', drugSpec: '10g/50ml', img: 'images/drug5.jpg', merchantName: '益丰诊所(静安店)', time: '前天 19 15:00', qty: 3, status: 'success', createdAt: Date.now() - 900000 }
+  ];
+  saveMyAppointments(seed);
 }
 
-function doCancelAppointment() {
-  document.getElementById('cancelConfirmModal').classList.remove('show');
-  if (!cancelTargetBtn) return;
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
-  const item = cancelTargetBtn.closest('.appointment-item');
-  const statusEl = item.querySelector('.appointment-status');
-  statusEl.className = 'appointment-status status-cancelled';
-  statusEl.textContent = '已取消';
-  item.setAttribute('data-status', 'cancelled');
-
-  // Replace action buttons with "再次预约"
-  const actionsDiv = cancelTargetBtn.parentElement;
-  actionsDiv.innerHTML = '<button class="btn-sm" onclick="goDrugDetail(1)">再次预约</button>';
-
-  showToast('预约已取消');
-  cancelTargetBtn = null;
+function renderMyAppointments() {
+  const listEl = document.getElementById('appointmentList');
+  if (!listEl) return;
+  let list = getMyAppointments();
+  if (!list) { seedAppointments(); list = getMyAppointments(); }
+  if (!list || !list.length) {
+    listEl.innerHTML = '<div class="empty-tip">暂无预约记录</div>';
+    return;
+  }
+  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  listEl.innerHTML = list.map(a => `
+    <div class="appointment-item">
+      <div class="appointment-item-header">
+        <span class="appointment-order-no">单号：${escHtml(a.orderNo)}</span>
+        <span class="appointment-status status-success">预约成功</span>
+      </div>
+      <div class="appointment-item-body">
+        <div class="appointment-item-icon"><img src="${escHtml(a.img || 'images/drug1.jpg')}" alt=""></div>
+        <div class="appointment-item-info">
+          <div class="appointment-item-drug">${escHtml(a.drugName)}</div>
+          <div class="appointment-item-merchant">${escHtml(a.merchantName)}</div>
+          <div class="appointment-item-time">📅 ${escHtml(a.time)}</div>
+          <div class="appointment-item-qty">📦 数量：${escHtml(a.qty)} 份</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function showToast(msg) {
   const toast = document.getElementById('toast');
+  if (!toast) return;
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
-// ===== Verify Arrival =====
-function verifyArrival() {
-  document.getElementById('verifyModal').classList.add('show');
-}
-function closeVerify() {
-  document.getElementById('verifyModal').classList.remove('show');
-}
-function doVerify() {
-  document.getElementById('verifyModal').classList.remove('show');
-  alert('✅ 核销成功！您已在商家范围内，订单已标记为已到店。');
 }
 
 // ===== QR Code =====
@@ -1124,6 +1147,8 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (page === 'appointment') {
     initDateSelector();
     prefillAppointment();
+  } else if (page === 'my-appointments') {
+    renderMyAppointments();
   } else if (page === 'map-picker') {
     setTimeout(() => initMapPicker(), 200);
   }
