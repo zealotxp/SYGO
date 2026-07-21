@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>test-order-search</title>
+<link rel="stylesheet" href="css/common.css">
+</head>
+<body data-page="merchant-orders">
+<div class="app-container" id="app">
+<div class="toast" id="toast"></div>
+<div class="page active" id="merchantOrdersPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">预约订单</div>
+    <div class="m-prod-search-wrap"><input class="m-prod-search" id="merchantOrderSearch" placeholder="搜索姓名 / 手机号"></div>
+    <div class="order-filter"><input type="date" id="merchantOrderStart"><span class="order-filter-sep">至</span><input type="date" id="merchantOrderEnd"><button class="btn-reset">全部</button></div>
+    <div class="appointment-list" id="merchantOrderList" style="margin-top:4px;">
+    <div class="m-order-item">
+      <div class="m-order-top"><span class="m-order-no">单号：YY4636603915</span><span class="m-order-qty">1 份</span></div>
+      <div class="m-order-grid">
+        <div class="m-order-cell"><span class="k">用户</span><b class="v">张伟</b></div>
+        <div class="m-order-cell"><span class="k">手机</span><b class="v">13910000000</b></div>
+        <div class="m-order-cell m-span2"><span class="k">预约药品</span><b class="v">阿莫西林胶囊</b></div>
+        <div class="m-order-cell m-span2"><span class="k">预约时间</span><b class="v">2026-07-21 09:00</b></div>
+      </div>
+    </div></div>
+</div>
+</div>
+<script>
+  localStorage.setItem('sygo_merchant_session', JSON.stringify({ id: 2, phone: '13800138001' }));
+  var sample = [];
+  var names = ['张伟','王芳','李娜','刘洋','陈静','杨磊','赵敏','黄强','周婷','吴昊','徐丽','孙鹏','马超','朱琳','胡军','郭涛'];
+  for (var i = 0; i < 16; i++) {
+    sample.push({
+      orderNo: 'YY' + (Date.now() - i * 1000).toString().slice(-10),
+      userName: names[i],
+      phone: '139' + String(10000000 + (i * 137) % 90000000).padStart(8, '0'),
+      drugName: ['阿莫西林胶囊','感冒灵颗粒','布洛芬缓释胶囊','头孢克肟片','维生素C片','复方甘草片','甲硝唑片','蒲地蓝消炎口服液'][i % 8],
+      qty: 1 + (i % 3),
+      time: '2026-07-' + String(21 - (i % 15)).padStart(2, '0') + ' ' + String(9 + (i % 10)).padStart(2,'0') + ':00'
+    });
+  }
+  localStorage.setItem('sygo_merchant_orders_2', JSON.stringify(sample));
+</script>
+<script src="js/app.js"></script>
+<script>
+  var sEl = document.getElementById('merchantOrderSearch');
+  sEl.value = '张伟';
+  searchMerchantOrder();
+</script>
+
+
+</body></html>

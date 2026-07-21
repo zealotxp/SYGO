@@ -1402,17 +1402,20 @@ function renderMerchantHome() {
 
 // ===== 商家预约订单列表（时间范围筛选）=====
 let merchantOrderStart = '', merchantOrderEnd = '';
+let merchantOrderKeyword = '';
 function renderMerchantOrders() {
   const s = requireMerchant(); if (!s) return;
   const listEl = document.getElementById('merchantOrderList'); if (!listEl) return;
   const orders = getOrdersForMerchant(s.id);
+  const kw = merchantOrderKeyword.trim().toLowerCase();
   const filtered = orders.filter(o => {
     const ds = o.time.slice(0, 10);
     if (merchantOrderStart && ds < merchantOrderStart) return false;
     if (merchantOrderEnd && ds > merchantOrderEnd) return false;
+    if (kw && !((o.userName || '') + ' ' + (o.phone || '')).toLowerCase().includes(kw)) return false;
     return true;
   }).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
-  if (!filtered.length) { listEl.innerHTML = '<div class="empty-tip">该时间段暂无预约记录</div>'; return; }
+  if (!filtered.length) { listEl.innerHTML = '<div class="empty-tip">' + (kw ? '未找到匹配的预约记录' : '该时间段暂无预约记录') + '</div>'; return; }
   listEl.innerHTML = filtered.map(o => `
     <div class="m-order-item">
       <div class="m-order-top"><span class="m-order-no">单号：${escHtml(o.orderNo)}</span><span class="m-order-qty">${escHtml(o.qty)} 份</span></div>
@@ -1433,6 +1436,11 @@ function resetMerchantOrderRange() {
   merchantOrderStart = ''; merchantOrderEnd = '';
   const s = document.getElementById('merchantOrderStart'); const e = document.getElementById('merchantOrderEnd');
   if (s) s.value = ''; if (e) e.value = '';
+  renderMerchantOrders();
+}
+function searchMerchantOrder() {
+  const el = document.getElementById('merchantOrderSearch');
+  merchantOrderKeyword = el ? el.value : '';
   renderMerchantOrders();
 }
 
