@@ -72,7 +72,7 @@ ctx.window.document = document;
 vm.createContext(ctx);
 vm.runInContext(appjs, ctx);
 
-const pages = ['home','search','drug-detail','merchant-detail','appointment','map-picker','my-appointments','profile','all-drugs','all-merchants','about','privacy','agreement','login'];
+const pages = ['home','search','drug-detail','merchant-detail','appointment','map-picker','my-appointments','profile','all-drugs','all-merchants','about','privacy','agreement','login','merchant-login','merchant','merchant-orders','merchant-stats','merchant-products','merchant-store','merchant-change-password'];
 // also test detail pages with an id param (simulate ?id=3)
 const paramCases = { 'drug-detail':'?id=3', 'merchant-detail':'?id=2', 'appointment':'?drug=3&merchant=1' };
 let fail = 0;

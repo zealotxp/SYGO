@@ -778,20 +778,88 @@ function goMyAppointments() { location.href = 'my-appointments.html'; }
 
 function goMerchantLogin() { location.href = 'merchant-login.html'; }
 
+function goMerchantLogin() { location.href = 'merchant-login.html'; }
+
 function doMerchantLogin() {
+  const lockRem = merchantLockRemaining();
+  if (lockRem > 0) { showToast('账号已锁定，请 ' + Math.ceil(lockRem / 60000) + ' 分钟后再试'); return; }
   const phone = document.getElementById('merchantLoginPhone');
   const pwd = document.getElementById('merchantLoginPwd');
   const phoneVal = phone ? phone.value.trim() : '';
-  if (!phoneVal || !/^1[3-9]\d{9}$/.test(phoneVal)) {
-    showToast('请输入正确的商家手机号');
+  if (!phoneVal || !/^1[3-9]\d{9}$/.test(phoneVal)) { showToast('请输入正确的商家手机号'); return; }
+  if (!pwd || !pwd.value) { showToast('请输入登录密码'); return; }
+  const acc = MERCHANT_ACCOUNTS.find(a => a.phone === phoneVal);
+  if (!acc || getMerchantPassword(acc.id) !== pwd.value) {
+    const l = recordMerchantFail(phoneVal);
+    if (l.lockUntil) showToast('密码错误次数过多，账号已锁定1小时');
+    else showToast('手机号或密码错误，还可尝试 ' + (5 - l.failCount) + ' 次');
     return;
   }
-  if (!pwd || !pwd.value) {
-    showToast('请输入登录密码');
-    return;
-  }
+  resetMerchantFail();
+  const m = merchantsData.find(x => x.id === acc.id);
+  setMerchantSession({ id: acc.id, name: m ? m.name : '', phone: phoneVal });
   showToast('商家登录成功');
-  setTimeout(() => { location.href = 'profile.html'; }, 1200);
+  setTimeout(() => { location.href = 'merchant.html'; }, 1000);
+}
+
+function doMerchantCodeLogin() {
+  const lockRem = merchantLockRemaining();
+  if (lockRem > 0) { showToast('账号已锁定，请 ' + Math.ceil(lockRem / 60000) + ' 分钟后再试'); return; }
+  const phone = document.getElementById('merchantLoginPhone');
+  const code = document.getElementById('merchantLoginCode');
+  const phoneVal = phone ? phone.value.trim() : '';
+  if (!phoneVal || !/^1[3-9]\d{9}$/.test(phoneVal)) { showToast('请输入正确的商家手机号'); return; }
+  if (!code || !/^\d{4,6}$/.test(code.value.trim())) { showToast('请输入验证码'); return; }
+  const acc = MERCHANT_ACCOUNTS.find(a => a.phone === phoneVal);
+  if (!acc) { showToast('该手机号未注册商家账号'); return; }
+  // 验证码登录（原型中任意验证码通过）
+  resetMerchantFail();
+  const m = merchantsData.find(x => x.id === acc.id);
+  setMerchantSession({ id: acc.id, name: m ? m.name : '', phone: phoneVal });
+  showToast('商家登录成功');
+  setTimeout(() => { location.href = 'merchant.html'; }, 1000);
+}
+
+let merchantCodeTimer = null;
+function sendMerchantCode() {
+  const phone = document.getElementById('merchantLoginPhone');
+  const phoneVal = phone ? phone.value.trim() : '';
+  if (!phoneVal || !/^1[3-9]\d{9}$/.test(phoneVal)) { showToast('请输入正确的商家手机号'); return; }
+  if (merchantCodeTimer) return;
+  let sec = 60;
+  showToast('验证码已发送（演示：任意验证码即可）');
+  const btn = document.getElementById('merchantSendCodeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = sec + 's'; }
+  merchantCodeTimer = setInterval(() => {
+    sec--;
+    if (btn) btn.textContent = sec + 's';
+    if (sec <= 0) { clearInterval(merchantCodeTimer); merchantCodeTimer = null; if (btn) { btn.disabled = false; btn.textContent = '获取验证码'; } }
+  }, 1000);
+}
+
+function merchantWechatPhone() {
+  // 微信快速验证手机号组件（原型中模拟自动填入账号手机号）
+  const phone = document.getElementById('merchantLoginPhone');
+  if (phone) phone.value = '13800138000';
+  showToast('已通过微信获取手机号');
+}
+
+function switchMerchantLoginTab(type) {
+  const panePwd = document.getElementById('panePwd');
+  const paneCode = document.getElementById('paneCode');
+  const tabPwd = document.getElementById('tabPwd');
+  const tabCode = document.getElementById('tabCode');
+  if (type === 'pwd') {
+    if (panePwd) panePwd.style.display = 'block';
+    if (paneCode) paneCode.style.display = 'none';
+    if (tabPwd) tabPwd.classList.add('active');
+    if (tabCode) tabCode.classList.remove('active');
+  } else {
+    if (paneCode) paneCode.style.display = 'block';
+    if (panePwd) panePwd.style.display = 'none';
+    if (tabCode) tabCode.classList.add('active');
+    if (tabPwd) tabPwd.classList.remove('active');
+  }
 }
 
 function goSearch() { location.href = 'search.html'; }
@@ -1194,6 +1262,321 @@ function restoreLocation() {
   try { addr = sessionStorage.getItem('userLocation') || ''; } catch(e) {}
   t.textContent = addr || '上海市浦东新区张杨路';
 }
+// ===== Merchant Portal (商家端) =====
+const PLATFORM_SETTINGS = { priceVisible: true }; // 平台是否展示商家价格（商家不可自行决定）
+
+// 平台商品库价格策略：建议销售价 / 最低限价（按 drug id）
+const PRODUCT_PRICE_MAP = {
+  1: { suggested: 580, min: 520 }, 2: { suggested: 560, min: 500 },
+  3: { suggested: 420, min: 380 }, 4: { suggested: 410, min: 370 },
+  5: { suggested: 405, min: 365 }, 6: { suggested: 415, min: 375 },
+  7: { suggested: 430, min: 390 }, 8: { suggested: 180, min: 150 },
+  9: { suggested: 1200, min: 1000 }, 10: { suggested: 980, min: 850 },
+  11: { suggested: 760, min: 680 }, 12: { suggested: 200, min: 170 },
+  13: { suggested: 220, min: 190 }
+};
+const MERCHANT_CATEGORY_LABELS = { immunoglobulin: '免疫球蛋白', albumin: '人血白蛋白', factor: '凝血因子', vaccine: '疫苗制品' };
+
+// 平台为商家创建的独立账号：手机号 + 初始密码（由平台设置）
+const MERCHANT_ACCOUNTS = [
+  { id: 1, phone: '13800138000', password: '123456' },
+  { id: 2, phone: '13800138001', password: '123456' },
+  { id: 3, phone: '13800138002', password: '123456' },
+  { id: 4, phone: '13800138003', password: '123456' },
+  { id: 5, phone: '13800138004', password: '123456' },
+  { id: 6, phone: '13800138005', password: '123456' },
+  { id: 7, phone: '13800138006', password: '123456' },
+  { id: 8, phone: '13800138007', password: '123456' }
+];
+
+const MERCHANT_LOCK_KEY = 'sygo_merchant_lock';
+const MERCHANT_SESSION_KEY = 'sygo_merchant_session';
+
+function getMerchantSession() { try { const r = localStorage.getItem(MERCHANT_SESSION_KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
+function setMerchantSession(s) { try { localStorage.setItem(MERCHANT_SESSION_KEY, JSON.stringify(s)); } catch (e) {} }
+function clearMerchantSession() { try { localStorage.removeItem(MERCHANT_SESSION_KEY); } catch (e) {} }
+function requireMerchant() { const s = getMerchantSession(); if (!s) { location.href = 'merchant-login.html'; return null; } return s; }
+function getMerchantPassword(id) { try { const r = localStorage.getItem('sygo_merchant_pw_' + id); if (r) return r; } catch (e) {} const a = MERCHANT_ACCOUNTS.find(x => x.id === id); return a ? a.password : ''; }
+function setMerchantPassword(id, pw) { try { localStorage.setItem('sygo_merchant_pw_' + id, pw); } catch (e) {} }
+
+// 登录失败锁定：连续5次失败锁定1小时
+function getMerchantLock() { try { const r = localStorage.getItem(MERCHANT_LOCK_KEY); if (r) return JSON.parse(r); } catch (e) {} return { phone: '', failCount: 0, lockUntil: 0 }; }
+function setMerchantLock(l) { try { localStorage.setItem(MERCHANT_LOCK_KEY, JSON.stringify(l)); } catch (e) {} }
+function merchantLockRemaining() { const l = getMerchantLock(); if (!l.lockUntil) return 0; const rem = l.lockUntil - Date.now(); return rem > 0 ? rem : 0; }
+function recordMerchantFail(phone) {
+  let l = getMerchantLock();
+  if (l.phone !== phone) l = { phone: phone, failCount: 0, lockUntil: 0 };
+  l.failCount += 1;
+  if (l.failCount >= 5) l.lockUntil = Date.now() + 3600000;
+  setMerchantLock(l);
+  return l;
+}
+function resetMerchantFail() { setMerchantLock({ phone: '', failCount: 0, lockUntil: 0 }); }
+
+// ===== 导航 =====
+function goMerchantHome() { location.href = 'merchant.html'; }
+function goMerchantOrders() { location.href = 'merchant-orders.html'; }
+function goMerchantStats() { location.href = 'merchant-stats.html'; }
+function goMerchantProducts() { location.href = 'merchant-products.html'; }
+function goMerchantStore() { location.href = 'merchant-store.html'; }
+function goMerchantChangePassword() { location.href = 'merchant-change-password.html'; }
+function merchantLogout() { clearMerchantSession(); resetMerchantFail(); location.href = 'profile.html'; }
+
+// ===== 商家在售商品（上下架 + 本店售价）=====
+function getMerchantOnsale(id) { try { const r = localStorage.getItem('sygo_merchant_onsale_' + id); if (r) return JSON.parse(r); } catch (e) {} return null; }
+function saveMerchantOnsale(id, list) { try { localStorage.setItem('sygo_merchant_onsale_' + id, JSON.stringify(list)); } catch (e) {} }
+function seedMerchantOnsale(id) {
+  const m = merchantsData.find(x => x.id === id); if (!m) return [];
+  const list = (m.drugs || []).map(did => ({ drugId: did, storePrice: (PRODUCT_PRICE_MAP[did] || { suggested: 0 }).suggested }));
+  saveMerchantOnsale(id, list); return list;
+}
+function getOnsaleForMerchant(id) { let list = getMerchantOnsale(id); if (!list) list = seedMerchantOnsale(id); return list || []; }
+function merchantToggleOnsale(id, drugId) {
+  const list = getOnsaleForMerchant(id);
+  const idx = list.findIndex(x => x.drugId === drugId);
+  if (idx >= 0) list.splice(idx, 1);
+  else list.push({ drugId: drugId, storePrice: (PRODUCT_PRICE_MAP[drugId] || { suggested: 0 }).suggested });
+  saveMerchantOnsale(id, list);
+}
+function setMerchantProductPrice(id, drugId, price) {
+  const list = getOnsaleForMerchant(id);
+  const item = list.find(x => x.drugId === drugId);
+  if (!item) return { ok: false, msg: '该药品未上架' };
+  const min = (PRODUCT_PRICE_MAP[drugId] || { min: 0 }).min;
+  if (!(price >= min)) return { ok: false, msg: '售价不能低于平台最低限价 ¥' + min };
+  item.storePrice = price; saveMerchantOnsale(id, list); return { ok: true };
+}
+function batchToggleMerchantProducts(id, drugIds, on) {
+  let list = getOnsaleForMerchant(id);
+  drugIds.forEach(did => {
+    const idx = list.findIndex(x => x.drugId === did);
+    if (on && idx < 0) list.push({ drugId: did, storePrice: (PRODUCT_PRICE_MAP[did] || { suggested: 0 }).suggested });
+    if (!on && idx >= 0) list.splice(idx, 1);
+  });
+  saveMerchantOnsale(id, list);
+}
+
+// ===== 商家预约订单 =====
+const MERCHANT_ORDER_NAMES = ['张伟', '王芳', '李娜', '刘洋', '陈静', '杨光', '赵磊', '黄敏', '周强', '吴婷', '孙丽', '马超'];
+function getMerchantOrders(id) { try { const r = localStorage.getItem('sygo_merchant_orders_' + id); if (r) return JSON.parse(r); } catch (e) {} return null; }
+function saveMerchantOrders(id, list) { try { localStorage.setItem('sygo_merchant_orders_' + id, JSON.stringify(list)); } catch (e) {} }
+function seedMerchantOrders(id) {
+  const m = merchantsData.find(x => x.id === id); if (!m) return [];
+  const now = Date.now(); const DAY = 86400000; const orders = [];
+  for (let i = 0; i < 16; i++) {
+    const dayOffset = Math.floor(i * 2.3) % 45;
+    const appt = new Date(now - dayOffset * DAY); appt.setHours(9 + (i % 10), (i % 2) ? 0 : 30, 0, 0);
+    const created = new Date(appt.getTime() - (i % 5 + 1) * 3600000 - (i % 3) * DAY);
+    const drugId = m.drugs[i % m.drugs.length];
+    const drug = drugsData.find(d => d.id === drugId);
+    const dt = new Date(appt);
+    const time = ymd(dt) + ' ' + String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
+    orders.push({
+      orderNo: 'YY' + (now - i * 1000).toString().slice(-10),
+      userName: MERCHANT_ORDER_NAMES[i % MERCHANT_ORDER_NAMES.length],
+      phone: '139' + String(10000000 + (i * 137) % 90000000).padStart(8, '0'),
+      drugName: drug ? drug.name : '药品', drugId: drugId, qty: 1 + (i % 3), time: time, createdAt: created.getTime()
+    });
+  }
+  saveMerchantOrders(id, orders); return orders;
+}
+function getOrdersForMerchant(id) { let list = getMerchantOrders(id); if (!list) list = seedMerchantOrders(id); return list || []; }
+
+// ===== 商家首页仪表盘 =====
+function renderMerchantHome() {
+  const s = requireMerchant(); if (!s) return;
+  const m = merchantsData.find(x => x.id === s.id);
+  const nameEl = document.getElementById('merchantHomeName');
+  if (nameEl) nameEl.textContent = m ? m.name : (s.name || '商家');
+  const orders = getOrdersForMerchant(s.id);
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const dow = (now.getDay() + 6) % 7;
+  const startOfWeek = startOfDay - dow * 86400000;
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  let day = 0, week = 0, month = 0;
+  orders.forEach(o => { const t = o.createdAt || 0; if (t >= startOfDay) day++; if (t >= startOfWeek) week++; if (t >= startOfMonth) month++; });
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('merchantStatDay', day); set('merchantStatWeek', week); set('merchantStatMonth', month);
+}
+
+// ===== 商家预约订单列表（时间范围筛选）=====
+let merchantOrderStart = '', merchantOrderEnd = '';
+function renderMerchantOrders() {
+  const s = requireMerchant(); if (!s) return;
+  const listEl = document.getElementById('merchantOrderList'); if (!listEl) return;
+  const orders = getOrdersForMerchant(s.id);
+  const filtered = orders.filter(o => {
+    const ds = o.time.slice(0, 10);
+    if (merchantOrderStart && ds < merchantOrderStart) return false;
+    if (merchantOrderEnd && ds > merchantOrderEnd) return false;
+    return true;
+  }).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+  if (!filtered.length) { listEl.innerHTML = '<div class="empty-tip">该时间段暂无预约记录</div>'; return; }
+  listEl.innerHTML = filtered.map(o => `
+    <div class="m-order-item">
+      <div class="m-order-top"><span class="m-order-no">单号：${escHtml(o.orderNo)}</span><span class="m-order-qty">${escHtml(o.qty)} 份</span></div>
+      <div class="m-order-row"><span>用户</span><b>${escHtml(o.userName)}</b></div>
+      <div class="m-order-row"><span>手机号</span><b>${escHtml(o.phone)}</b></div>
+      <div class="m-order-row"><span>预约药品</span><b>${escHtml(o.drugName)}</b></div>
+      <div class="m-order-row"><span>预约时间</span><b>${escHtml(o.time)}</b></div>
+    </div>`).join('');
+}
+function filterMerchantOrdersRange() {
+  const s = document.getElementById('merchantOrderStart'); const e = document.getElementById('merchantOrderEnd');
+  merchantOrderStart = s ? s.value : ''; merchantOrderEnd = e ? e.value : '';
+  renderMerchantOrders();
+}
+function resetMerchantOrderRange() {
+  merchantOrderStart = ''; merchantOrderEnd = '';
+  const s = document.getElementById('merchantOrderStart'); const e = document.getElementById('merchantOrderEnd');
+  if (s) s.value = ''; if (e) e.value = '';
+  renderMerchantOrders();
+}
+
+// ===== 商家预约统计（周期 + 维度）=====
+let merchantStatPeriod = 'day';
+let merchantStatDim = 'order';
+function renderMerchantStats() {
+  const s = requireMerchant(); if (!s) return;
+  const wrap = document.getElementById('merchantStatBars'); if (!wrap) return;
+  const orders = getOrdersForMerchant(s.id);
+  let rows = [];
+  if (merchantStatDim === 'order') {
+    if (merchantStatPeriod === 'day') {
+      const buckets = []; const today = new Date(); today.setHours(0, 0, 0, 0);
+      for (let i = 6; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate() - i); buckets.push({ label: (d.getMonth() + 1) + '/' + d.getDate(), key: ymd(d), count: 0 }); }
+      orders.forEach(o => { const b = buckets.find(x => x.key === o.time.slice(0, 10)); if (b) b.count++; });
+      rows = buckets.map(b => ({ label: b.label, count: b.count }));
+    } else if (merchantStatPeriod === 'week') {
+      const buckets = []; const now = new Date(); const dow = (now.getDay() + 6) % 7; const sow = new Date(now); sow.setHours(0, 0, 0, 0); sow.setDate(now.getDate() - dow);
+      for (let i = 7; i >= 0; i--) { const ws = new Date(sow); ws.setDate(sow.getDate() - i * 7); const we = new Date(ws); we.setDate(ws.getDate() + 6); buckets.push({ label: (ws.getMonth() + 1) + '/' + ws.getDate(), start: ws.getTime(), end: we.getTime() + 86400000 - 1, count: 0 }); }
+      orders.forEach(o => { const t = new Date(o.time.slice(0, 10)).getTime(); const b = buckets.find(x => t >= x.start && t <= x.end); if (b) b.count++; });
+      rows = buckets.map(b => ({ label: b.label, count: b.count }));
+    } else {
+      const buckets = []; const now = new Date(); now.setDate(1); now.setHours(0, 0, 0, 0);
+      for (let i = 5; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); buckets.push({ label: (d.getMonth() + 1) + '月', start: d.getTime(), end: new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime() - 1, count: 0 }); }
+      orders.forEach(o => { const t = new Date(o.time.slice(0, 10)).getTime(); const b = buckets.find(x => t >= x.start && t <= x.end); if (b) b.count++; });
+      rows = buckets.map(b => ({ label: b.label, count: b.count }));
+    }
+  } else {
+    const map = {};
+    orders.forEach(o => { map[o.drugName] = (map[o.drugName] || 0) + 1; });
+    rows = Object.keys(map).map(k => ({ label: k, count: map[k] })).sort((a, b) => b.count - a.count);
+  }
+  const max = Math.max(1, ...rows.map(r => r.count));
+  wrap.innerHTML = rows.map(r => `
+    <div class="m-stat-row">
+      <div class="m-stat-label">${escHtml(r.label)}</div>
+      <div class="m-stat-bar-wrap"><div class="m-stat-bar" style="width:${Math.round(r.count / max * 100)}%"></div></div>
+      <div class="m-stat-count">${r.count}</div>
+    </div>`).join('');
+  document.querySelectorAll('.m-stat-period').forEach(el => el.classList.toggle('active', el.dataset.period === merchantStatPeriod));
+  document.querySelectorAll('.m-stat-dim').forEach(el => el.classList.toggle('active', el.dataset.dim === merchantStatDim));
+}
+function setMerchantStatPeriod(p) { merchantStatPeriod = p; renderMerchantStats(); }
+function setMerchantStatDim(d) { merchantStatDim = d; renderMerchantStats(); }
+
+// ===== 商家商品管理 =====
+let merchantProductKeyword = '';
+let merchantProductCategory = '';
+let merchantProductSelected = [];
+function renderMerchantCategoryTabs() {
+  const wrap = document.getElementById('merchantCategoryTabs'); if (!wrap) return;
+  let html = '<div class="m-prod-cat-tab active" data-cat="" onclick="setMerchantProductCategory(\'\')">全部</div>';
+  Object.keys(MERCHANT_CATEGORY_LABELS).forEach(c => { html += `<div class="m-prod-cat-tab" data-cat="${c}" onclick="setMerchantProductCategory('${c}')">${MERCHANT_CATEGORY_LABELS[c]}</div>`; });
+  wrap.innerHTML = html;
+}
+function renderMerchantProducts() {
+  const s = requireMerchant(); if (!s) return;
+  const listEl = document.getElementById('merchantProductList'); if (!listEl) return;
+  const onsale = getOnsaleForMerchant(s.id);
+  const onsaleMap = {}; onsale.forEach(x => onsaleMap[x.drugId] = x.storePrice);
+  const kw = merchantProductKeyword.toLowerCase(); const cat = merchantProductCategory;
+  const list = drugsData.filter(d => {
+    if (kw && !(d.name.toLowerCase().includes(kw) || (d.spec || '').toLowerCase().includes(kw))) return false;
+    if (cat && d.category !== cat) return false;
+    return true;
+  });
+  if (!list.length) { listEl.innerHTML = '<div class="empty-tip">未找到匹配药品</div>'; return; }
+  listEl.innerHTML = list.map(d => {
+    const on = d.id in onsaleMap; const price = onsaleMap[d.id];
+    const min = (PRODUCT_PRICE_MAP[d.id] || { min: 0 }).min;
+    const suggested = (PRODUCT_PRICE_MAP[d.id] || { suggested: 0 }).suggested;
+    const sel = merchantProductSelected.includes(d.id);
+    const priceHtml = PLATFORM_SETTINGS.priceVisible
+      ? `<div class="m-prod-price"><div class="m-prod-price-row"><span>本店售价</span><input class="m-prod-price-input" type="number" id="price-${d.id}" value="${on ? price : suggested}" ${on ? '' : 'disabled'} onchange="onMerchantPriceChange(${d.id})"></div><div class="m-prod-min">平台最低限价：¥${min}（低于不可保存）</div></div>`
+      : `<div class="m-prod-price"><div class="m-prod-min">平台设置：本店价格暂不展示</div></div>`;
+    return `
+      <div class="m-prod-item ${on ? 'on' : ''}">
+        <label class="m-prod-check"><input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleMerchantProductSelect(${d.id}, this.checked)"></label>
+        <div class="m-prod-icon">${d.emoji || '💊'}</div>
+        <div class="m-prod-info">
+          <div class="m-prod-name">${escHtml(d.name)}</div>
+          <div class="m-prod-spec">${escHtml(d.spec || '')} · ${escHtml(d.spec2 || '')}</div>
+          <div class="m-prod-cat">${MERCHANT_CATEGORY_LABELS[d.category] || d.category}</div>
+          ${priceHtml}
+        </div>
+        <div class="m-prod-action"><button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button></div>
+      </div>`;
+  }).join('');
+  updateMerchantBatchBar();
+}
+function toggleMerchantProduct(drugId) { const s = requireMerchant(); if (!s) return; merchantToggleOnsale(s.id, drugId); renderMerchantProducts(); }
+function onMerchantPriceChange(drugId) {
+  const s = requireMerchant(); if (!s) return;
+  const input = document.getElementById('price-' + drugId); if (!input) return;
+  const val = parseFloat(input.value); const min = (PRODUCT_PRICE_MAP[drugId] || { min: 0 }).min;
+  if (isNaN(val) || val < min) {
+    showToast('售价不能低于平台最低限价 ¥' + min);
+    const onsale = getOnsaleForMerchant(s.id); const item = onsale.find(x => x.drugId === drugId);
+    input.value = item ? item.storePrice : (PRODUCT_PRICE_MAP[drugId] || { suggested: 0 }).suggested;
+    return;
+  }
+  const r = setMerchantProductPrice(s.id, drugId, val);
+  if (!r.ok) showToast(r.msg); else showToast('价格已保存');
+}
+function toggleMerchantProductSelect(drugId, checked) {
+  if (checked) { if (!merchantProductSelected.includes(drugId)) merchantProductSelected.push(drugId); }
+  else merchantProductSelected = merchantProductSelected.filter(x => x !== drugId);
+  updateMerchantBatchBar();
+}
+function updateMerchantBatchBar() {
+  const bar = document.getElementById('merchantBatchBar'); if (!bar) return;
+  const n = merchantProductSelected.length;
+  bar.style.display = n > 0 ? 'flex' : 'none';
+  const cnt = document.getElementById('merchantBatchCount'); if (cnt) cnt.textContent = n;
+}
+function merchantBatchOn() { const s = requireMerchant(); if (!s || !merchantProductSelected.length) return; batchToggleMerchantProducts(s.id, merchantProductSelected, true); merchantProductSelected = []; renderMerchantProducts(); showToast('已批量上架'); }
+function merchantBatchOff() { const s = requireMerchant(); if (!s || !merchantProductSelected.length) return; batchToggleMerchantProducts(s.id, merchantProductSelected, false); merchantProductSelected = []; renderMerchantProducts(); showToast('已批量下架'); }
+function searchMerchantProduct() { const el = document.getElementById('merchantProductSearch'); merchantProductKeyword = el ? el.value.trim() : ''; renderMerchantProducts(); }
+function setMerchantProductCategory(cat) { merchantProductCategory = cat; document.querySelectorAll('.m-prod-cat-tab').forEach(el => el.classList.toggle('active', el.dataset.cat === cat)); renderMerchantProducts(); }
+
+// ===== 商家店铺管理（只读）=====
+function renderMerchantStore() {
+  const s = requireMerchant(); if (!s) return;
+  const m = merchantsData.find(x => x.id === s.id); if (!m) return;
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('storeName', m.name); set('storeAddr', m.addr); set('storePhone', m.phone);
+  set('storeHours', m.hours); set('storeDistance', m.distance); set('storeTags', (m.tags || []).join('、'));
+  const certWrap = document.getElementById('storeCertList');
+  if (certWrap && m.certs) certWrap.innerHTML = m.certs.map((c, i) => `<img class="store-cert-thumb" src="${c}" onclick="openImagePreview('${c}')" alt="资质${i + 1}">`).join('');
+}
+
+// ===== 商家修改密码 =====
+function doChangeMerchantPassword() {
+  const s = requireMerchant(); if (!s) return;
+  const oldEl = document.getElementById('cpOld'); const newEl = document.getElementById('cpNew'); const confirmEl = document.getElementById('cpConfirm');
+  const oldV = oldEl ? oldEl.value : ''; const newV = newEl ? newEl.value : ''; const confirmV = confirmEl ? confirmEl.value : '';
+  if (!oldV) { showToast('请输入原密码'); return; }
+  if (getMerchantPassword(s.id) !== oldV) { showToast('原密码错误'); return; }
+  if (!newV || newV.length < 6) { showToast('新密码至少6位'); return; }
+  if (newV !== confirmV) { showToast('两次输入的新密码不一致'); return; }
+  setMerchantPassword(s.id, newV);
+  showToast('密码修改成功');
+  setTimeout(() => { location.href = 'merchant.html'; }, 1000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'home') {
@@ -1212,5 +1595,16 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMyAppointments();
   } else if (page === 'map-picker') {
     setTimeout(() => initMapPicker(), 200);
+  } else if (page === 'merchant') {
+    renderMerchantHome();
+  } else if (page === 'merchant-orders') {
+    renderMerchantOrders();
+  } else if (page === 'merchant-stats') {
+    renderMerchantStats();
+  } else if (page === 'merchant-products') {
+    renderMerchantCategoryTabs();
+    renderMerchantProducts();
+  } else if (page === 'merchant-store') {
+    renderMerchantStore();
   }
 });

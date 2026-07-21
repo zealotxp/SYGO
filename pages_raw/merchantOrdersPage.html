@@ -1,0 +1,18 @@
+<div class="page" id="merchantOrdersPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      预约订单
+    </div>
+
+    <div class="order-filter">
+      <label>预约日期</label>
+      <input type="date" id="merchantOrderStart" onchange="filterMerchantOrdersRange()">
+      <span class="order-filter-sep">至</span>
+      <input type="date" id="merchantOrderEnd" onchange="filterMerchantOrdersRange()">
+      <button class="btn-reset" onclick="resetMerchantOrderRange()">全部</button>
+    </div>
+
+    <div class="appointment-list" id="merchantOrderList" style="margin-top:12px;"></div>
+  </div>

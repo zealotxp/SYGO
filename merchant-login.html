@@ -25,9 +25,30 @@
     </div>
 
     <div class="login-card">
-      <input class="login-phone-input" type="tel" placeholder="请输入商家手机号" id="merchantLoginPhone" maxlength="11">
-      <input class="login-phone-input" type="password" placeholder="请输入登录密码" id="merchantLoginPwd" style="margin-top:10px;">
-      <button class="btn-primary" style="margin-top:16px;width:100%;height:44px;border-radius:22px;" onclick="doMerchantLogin()">登录</button>
+      <div class="login-tabs">
+        <div class="login-tab active" id="tabPwd" onclick="switchMerchantLoginTab('pwd')">密码登录</div>
+        <div class="login-tab" id="tabCode" onclick="switchMerchantLoginTab('code')">验证码登录</div>
+      </div>
+
+      <input class="login-phone-input" type="tel" placeholder="请输入商家手机号" id="merchantLoginPhone" maxlength="11" style="margin-top:14px;">
+
+      <div id="panePwd">
+        <input class="login-phone-input" type="password" placeholder="请输入登录密码" id="merchantLoginPwd" style="margin-top:10px;">
+        <button class="btn-primary" style="margin-top:16px;width:100%;height:44px;border-radius:22px;" onclick="doMerchantLogin()">登录</button>
+      </div>
+
+      <div id="paneCode" style="display:none;">
+        <div class="login-code-row" style="margin-top:10px;">
+          <input class="login-phone-input" type="tel" placeholder="请输入验证码" id="merchantLoginCode" maxlength="6" style="flex:1;">
+          <button class="btn-code" id="merchantSendCodeBtn" onclick="sendMerchantCode()">获取验证码</button>
+        </div>
+        <button class="btn-wechat" onclick="merchantWechatPhone()">微信快速验证手机号</button>
+        <button class="btn-primary" style="margin-top:16px;width:100%;height:44px;border-radius:22px;" onclick="doMerchantCodeLogin()">登录</button>
+      </div>
+
+      <div class="login-links">
+        <a href="javascript:void(0)" onclick="goMerchantChangePassword()">修改密码</a>
+      </div>
       <div class="login-privacy">
         登录即代表同意 <a href="javascript:void(0)" onclick="showUserAgreement()">《用户协议》</a> 和 <a href="javascript:void(0)" onclick="showPrivacy()">《隐私政策》</a>
       </div>

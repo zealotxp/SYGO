@@ -43,6 +43,12 @@ PAGES = [
     ('map-picker.html', 'mapPickerPage', '选择位置 - 上药GO', 'map-picker', False, None, ['toast'], True, None),
     ('login.html', 'loginPage', '登录 - 上药GO', 'login', False, None, ['toast'], False, None),
     ('merchant-login.html', 'merchantLoginPage', '商家登录 - 上药GO', 'merchant-login', False, None, ['toast'], False, None),
+    ('merchant.html', 'merchantPage', '商家中心 - 上药GO', 'merchant', False, None, ['toast'], False, None),
+    ('merchant-orders.html', 'merchantOrdersPage', '预约订单 - 上药GO', 'merchant-orders', False, None, ['toast'], False, None),
+    ('merchant-stats.html', 'merchantStatsPage', '订单统计 - 上药GO', 'merchant-stats', False, None, ['toast'], False, None),
+    ('merchant-products.html', 'merchantProductsPage', '商品管理 - 上药GO', 'merchant-products', False, None, ['toast'], False, None),
+    ('merchant-store.html', 'merchantStorePage', '店铺信息 - 上药GO', 'merchant-store', False, None, ['imagePreviewModal','toast'], False, None),
+    ('merchant-change-password.html', 'merchantChangePasswordPage', '修改密码 - 上药GO', 'merchant-change-password', False, None, ['toast'], False, None),
 ]
 
 for (file, src, title, page, hasTab, tabActive, modals, leaflet, extra) in PAGES:

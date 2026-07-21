@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>店铺信息 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="merchant-store">
+<div class="app-container" id="app">
+<div class="modal-overlay image-preview-overlay" id="imagePreviewModal" onclick="closeImagePreview()">
+  <img class="image-preview-img" id="imagePreviewImg" src="" alt="预览大图" onclick="event.stopPropagation()">
+</div>
+<div class="toast" id="toast"></div>
+<div class="page active" id="merchantStorePage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      店铺信息
+    </div>
+
+    <div class="store-info-card">
+      <div class="store-info-name" id="storeName">--</div>
+      <div class="store-info-row"><span>地址</span><b id="storeAddr">--</b></div>
+      <div class="store-info-row"><span>电话</span><b id="storePhone">--</b></div>
+      <div class="store-info-row"><span>营业时间</span><b id="storeHours">--</b></div>
+      <div class="store-info-row"><span>距离</span><b id="storeDistance">--</b></div>
+      <div class="store-info-row"><span>经营品类</span><b id="storeTags">--</b></div>
+      <div class="store-info-tip">以上信息由平台维护，商家不可修改</div>
+    </div>
+
+    <div class="store-cert-block">
+      <div class="store-cert-title">资质文件（点击查看大图）</div>
+      <div class="store-cert-list" id="storeCertList"></div>
+    </div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

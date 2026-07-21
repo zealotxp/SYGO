@@ -1,0 +1,20 @@
+<div class="page" id="merchantStatsPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      订单统计
+    </div>
+
+    <div class="seg-tabs" style="margin:12px 16px;">
+      <div class="seg-tab m-stat-period active" data-period="day" onclick="setMerchantStatPeriod('day')">按日</div>
+      <div class="seg-tab m-stat-period" data-period="week" onclick="setMerchantStatPeriod('week')">按周</div>
+      <div class="seg-tab m-stat-period" data-period="month" onclick="setMerchantStatPeriod('month')">按月</div>
+    </div>
+    <div class="seg-tabs" style="margin:0 16px 12px;">
+      <div class="seg-tab m-stat-dim active" data-dim="order" onclick="setMerchantStatDim('order')">按订单</div>
+      <div class="seg-tab m-stat-dim" data-dim="drug" onclick="setMerchantStatDim('drug')">按药品</div>
+    </div>
+
+    <div class="merchant-stat-bars" id="merchantStatBars"></div>
+  </div>

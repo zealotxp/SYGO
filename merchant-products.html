@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>商品管理 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="merchant-products">
+<div class="app-container" id="app">
+<div class="toast" id="toast"></div>
+<div class="page active" id="merchantProductsPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      商品管理
+    </div>
+
+    <div class="m-prod-search-wrap">
+      <input class="m-prod-search" id="merchantProductSearch" placeholder="搜索药品名称 / 规格" oninput="searchMerchantProduct()">
+    </div>
+    <div class="m-prod-cat-tabs" id="merchantCategoryTabs"></div>
+
+    <div class="appointment-list" id="merchantProductList" style="margin-top:8px;"></div>
+
+    <div class="merchant-batch-bar" id="merchantBatchBar" style="display:none;">
+      <span>已选 <b id="merchantBatchCount">0</b> 项</span>
+      <div>
+        <button class="btn-batch on" onclick="merchantBatchOn()">批量上架</button>
+        <button class="btn-batch off" onclick="merchantBatchOff()">批量下架</button>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
