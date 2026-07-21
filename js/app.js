@@ -1422,8 +1422,8 @@ function renderMerchantOrders() {
       <div class="m-order-grid">
         <div class="m-order-cell"><span class="k">用户</span><b class="v">${escHtml(o.userName)}</b></div>
         <div class="m-order-cell"><span class="k">手机</span><b class="v">${escHtml(o.phone)}</b></div>
-        <div class="m-order-cell m-span2"><span class="k">预约药品</span><b class="v">${escHtml(o.drugName)}</b></div>
-        <div class="m-order-cell m-span2"><span class="k">预约时间</span><b class="v">${escHtml(o.time)}</b></div>
+        <div class="m-order-cell"><span class="k">预约时间</span><b class="v">${escHtml(o.time)}</b></div>
+        <div class="m-order-cell"><span class="k">药品</span><b class="v">${escHtml(o.drugName)}</b></div>
       </div>
     </div>`).join('');
 }

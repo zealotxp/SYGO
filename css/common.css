@@ -1883,7 +1883,6 @@
   .m-order-cell { display: flex; align-items: center; font-size: 12px; line-height: 1.25; min-width: 0; }
   .m-order-cell .k { color: var(--text-light); flex: none; margin-right: 4px; }
   .m-order-cell .v { color: var(--text); font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .m-order-cell.m-span2 { grid-column: 1 / -1; }
 
   /* ===== Segmented Tabs (stats) ===== */
   .seg-tabs { display: flex; background: var(--bg); border-radius: 10px; padding: 3px; }
