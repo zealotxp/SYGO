@@ -1875,7 +1875,7 @@
   .merchant-menu-text { flex: 1; font-size: 14px; font-weight: 500; }
 
   /* ===== Merchant Order List ===== */
-  .m-order-item { background: #fff; margin: 6px 10px; border-radius: 10px; box-shadow: var(--shadow); padding: 8px 10px; overflow: hidden; }
+  .m-order-item { background: #fff; border-bottom: 1px solid var(--border); padding: 8px 12px; overflow: hidden; }
   .m-order-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 5px; margin-bottom: 5px; border-bottom: 1px solid var(--border); }
   .m-order-no { font-size: 11px; color: var(--text-light); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .m-order-qty { font-size: 12px; font-weight: 600; color: var(--primary); flex: none; margin-left: 8px; }
