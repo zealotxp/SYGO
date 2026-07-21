@@ -25,6 +25,9 @@
 
   <!-- ========== Success Modal ========== -->
 <div class="toast" id="toast"></div>
+<div class="modal-overlay image-preview-overlay" id="imagePreviewModal" onclick="closeImagePreview()">
+  <img class="image-preview-img" id="imagePreviewImg" src="" alt="预览大图" onclick="event.stopPropagation()">
+</div>
 <div class="page active" id="merchantDetailPage">
     <div class="nav-bar" style="background:transparent;position:absolute;top:0;left:0;right:0;z-index:100;">
       <div class="back-btn" onclick="goBack()" style="background:rgba(0,0,0,0.3);">

@@ -17,14 +17,14 @@ const drugsData = [
 ];
 
 const merchantsData = [
-  { id:1, name:'仁济诊所(浦东店)', addr:'浦东新区张杨路500号', phone:'021-5888-XXXX', hours:'08:00-22:00', distance:'580m', distNum:0.58, icon:'🏥', iconBg:'var(--orange-light)', certified:true, drugs:[1,3,4,6,7], tags:['静注人免疫球蛋白','人血白蛋白'], drugCount:5, is24h:false },
-  { id:2, name:'国大诊所(徐汇店)', addr:'徐汇区漕溪北路200号', phone:'021-5466-XXXX', hours:'07:30-22:30', distance:'1.2km', distNum:1.2, icon:'🏪', iconBg:'var(--primary-light)', certified:true, drugs:[1,2,3,7], tags:['人血白蛋白','静注人免疫球蛋白'], drugCount:4, is24h:false },
-  { id:3, name:'益丰诊所(静安店)', addr:'静安区南京西路1200号', phone:'021-6299-XXXX', hours:'08:00-21:30', distance:'2.1km', distNum:2.1, icon:'🏥', iconBg:'#E8F0FE', certified:true, drugs:[1,3,5], tags:['人血白蛋白','静注人免疫球蛋白'], drugCount:2, is24h:false },
-  { id:4, name:'老百姓诊所(长宁店)', addr:'长宁区天山路800号', phone:'021-5207-XXXX', hours:'08:30-21:00', distance:'2.8km', distNum:2.8, icon:'🏪', iconBg:'#FFF3E8', certified:true, drugs:[2,7], tags:['人血白蛋白'], drugCount:2, is24h:false },
-  { id:5, name:'华氏诊所(杨浦店)', addr:'杨浦区控江路1500号', phone:'021-6519-XXXX', hours:'24小时营业', distance:'3.5km', distNum:3.5, icon:'🏥', iconBg:'#F3E8FC', certified:true, drugs:[4,6,7,11,13], tags:['静注人免疫球蛋白','人血白蛋白'], drugCount:6, is24h:true },
-  { id:6, name:'海王星辰诊所(虹口店)', addr:'虹口区四川北路1800号', phone:'021-6541-XXXX', hours:'08:00-22:00', distance:'4.2km', distNum:4.2, icon:'🏪', iconBg:'#E8FCF3', certified:true, drugs:[5,11], tags:['人血白蛋白'], drugCount:3, is24h:false },
-  { id:7, name:'第一医药诊所(黄浦店)', addr:'黄浦区南京东路600号', phone:'021-6322-XXXX', hours:'07:00-23:00', distance:'5.0km', distNum:5.0, icon:'🏥', iconBg:'#FCE8E8', certified:true, drugs:[3,6,7,8,9,10], tags:['静注人免疫球蛋白','人血白蛋白','凝血因子'], drugCount:5, is24h:false },
-  { id:8, name:'复美诊所(普陀店)', addr:'普陀区曹杨路800号', phone:'021-5290-XXXX', hours:'08:30-21:30', distance:'5.8km', distNum:5.8, icon:'🏪', iconBg:'#E8F0FE', certified:true, drugs:[12], tags:['人血白蛋白'], drugCount:1, is24h:false }
+  { id:1, name:'仁济诊所(浦东店)', addr:'浦东新区张杨路500号', phone:'021-5888-XXXX', hours:'08:00-22:00', distance:'580m', distNum:0.58, icon:'🏥', iconBg:'var(--orange-light)', certified:true, drugs:[1,3,4,6,7], tags:['静注人免疫球蛋白','人血白蛋白'], drugCount:5, is24h:false, hero:'images/store1.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] },
+  { id:2, name:'国大诊所(徐汇店)', addr:'徐汇区漕溪北路200号', phone:'021-5466-XXXX', hours:'07:30-22:30', distance:'1.2km', distNum:1.2, icon:'🏪', iconBg:'var(--primary-light)', certified:true, drugs:[1,2,3,7], tags:['人血白蛋白','静注人免疫球蛋白'], drugCount:4, is24h:false, hero:'images/store2.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] },
+  { id:3, name:'益丰诊所(静安店)', addr:'静安区南京西路1200号', phone:'021-6299-XXXX', hours:'08:00-21:30', distance:'2.1km', distNum:2.1, icon:'🏥', iconBg:'#E8F0FE', certified:true, drugs:[1,3,5], tags:['人血白蛋白','静注人免疫球蛋白'], drugCount:2, is24h:false, hero:'images/store3.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] },
+  { id:4, name:'老百姓诊所(长宁店)', addr:'长宁区天山路800号', phone:'021-5207-XXXX', hours:'08:30-21:00', distance:'2.8km', distNum:2.8, icon:'🏪', iconBg:'#FFF3E8', certified:true, drugs:[2,7], tags:['人血白蛋白'], drugCount:2, is24h:false, hero:'images/store4.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] },
+  { id:5, name:'华氏诊所(杨浦店)', addr:'杨浦区控江路1500号', phone:'021-6519-XXXX', hours:'24小时营业', distance:'3.5km', distNum:3.5, icon:'🏥', iconBg:'#F3E8FC', certified:true, drugs:[4,6,7,11,13], tags:['静注人免疫球蛋白','人血白蛋白'], drugCount:6, is24h:true, hero:'images/store5.svg', certs:['images/cert-business.svg','images/cert-pharma.svg','images/cert-gmp.svg'] },
+  { id:6, name:'海王星辰诊所(虹口店)', addr:'虹口区四川北路1800号', phone:'021-6541-XXXX', hours:'08:00-22:00', distance:'4.2km', distNum:4.2, icon:'🏪', iconBg:'#E8FCF3', certified:true, drugs:[5,11], tags:['人血白蛋白'], drugCount:3, is24h:false, hero:'images/store6.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] },
+  { id:7, name:'第一医药诊所(黄浦店)', addr:'黄浦区南京东路600号', phone:'021-6322-XXXX', hours:'07:00-23:00', distance:'5.0km', distNum:5.0, icon:'🏥', iconBg:'#FCE8E8', certified:true, drugs:[3,6,7,8,9,10], tags:['静注人免疫球蛋白','人血白蛋白','凝血因子'], drugCount:5, is24h:false, hero:'images/store7.svg', certs:['images/cert-business.svg','images/cert-pharma.svg','images/cert-gmp.svg'] },
+  { id:8, name:'复美诊所(普陀店)', addr:'普陀区曹杨路800号', phone:'021-5290-XXXX', hours:'08:30-21:30', distance:'5.8km', distNum:5.8, icon:'🏪', iconBg:'#E8F0FE', certified:true, drugs:[12], tags:['人血白蛋白'], drugCount:1, is24h:false, hero:'images/store8.svg', certs:['images/cert-business.svg','images/cert-pharma.svg'] }
 ];
 
 // Current selected drug/merchant for detail & appointment context
@@ -705,7 +705,9 @@ function renderMerchantDetail(id) {
   currentMerchantId = id;
   const merchant = merchantsData.find(m => m.id === id) || merchantsData[0];
   const hero = document.querySelector('#merchantDetailPage .merchant-detail-hero');
-  if (hero) hero.textContent = merchant.icon;
+  if (hero) hero.innerHTML = merchant.hero
+    ? '<img class="merchant-detail-hero-img" src="' + merchant.hero + '" alt="商家门头照" onclick="openImagePreview(\'' + merchant.hero + '\')">'
+    : merchant.icon;
 
   const card = document.querySelector('#merchantDetailPage .merchant-detail-card');
   if (card) {
@@ -737,6 +739,13 @@ function renderMerchantDetail(id) {
         + '</div></div>';
     });
     drugSection.innerHTML = html;
+  }
+
+  const certWrap = document.querySelector('#merchantDetailPage .cert-images');
+  if (certWrap && merchant.certs && merchant.certs.length) {
+    certWrap.innerHTML = merchant.certs.map(function (c) {
+      return '<img class="cert-img" src="' + c + '" alt="资质证书" onclick="openImagePreview(\'' + c + '\')">';
+    }).join('');
   }
 }
 
@@ -1042,9 +1051,20 @@ function callMerchant() {
   window.location.href = 'tel:0215888XXXX';
 }
 
+function openImagePreview(src) {
+  const img = document.getElementById('imagePreviewImg');
+  if (img) img.src = src;
+  const m = document.getElementById('imagePreviewModal');
+  if (m) m.classList.add('show');
+}
+function closeImagePreview() {
+  const m = document.getElementById('imagePreviewModal');
+  if (m) m.classList.remove('show');
+}
 function previewCert(index) {
-  const certNames = ['营业执照', '药品经营许可证'];
-  alert('查看资质证书：' + certNames[index - 1] + '\n（实际项目中此处展示证书大图）');
+  const m = merchantsData.find(x => x.id === currentMerchantId) || merchantsData[0];
+  const src = (m.certs && m.certs[index - 1]) ? m.certs[index - 1] : 'images/cert-business.svg';
+  openImagePreview(src);
 }
 
 // ===== Login =====
