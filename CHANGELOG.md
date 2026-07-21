@@ -1,5 +1,8 @@
 # 更新记录
 
+## [1.2.9] - 2026-07-21
+- 个人中心去掉待到店/已核销/已取消三个统计数量，删除profile-stats块及对应CSS
+
 ## [1.2.8] - 2026-07-21
 - profile页增加商家登录入口：新增merchant-login页(手机号+密码登录)，goMerchantLogin/doMerchantLogin
 

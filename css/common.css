@@ -1115,18 +1115,6 @@
     font-weight: 600;
   }
   .profile-id { font-size: 12px; opacity: 0.8; margin-top: 4px; }
-  .profile-stats {
-    display: flex;
-    margin-top: 20px;
-    gap: 0;
-  }
-  .profile-stat {
-    flex: 1;
-    text-align: center;
-  }
-  .profile-stat-num { font-size: 22px; font-weight: 700; }
-  .profile-stat-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
-  .profile-stat + .profile-stat { border-left: 1px solid rgba(255,255,255,0.2); }
 
   .profile-menu {
     margin: -20px 16px 10px;
