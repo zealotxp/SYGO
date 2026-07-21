@@ -1232,6 +1232,119 @@
     transform: translate(-50%, -50%) scale(1);
   }
 
+  /* ===== Merchant Picker (bottom sheet) ===== */
+  .merchant-picker-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2500;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .merchant-picker-overlay.show { display: flex; }
+  .merchant-picker-sheet {
+    width: 100%;
+    max-width: 480px;
+    background: var(--white);
+    border-radius: 16px 16px 0 0;
+    max-height: 78vh;
+    display: flex;
+    flex-direction: column;
+    animation: sheetUp 0.3s ease;
+  }
+  @keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .merchant-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .merchant-picker-title { font-size: 16px; font-weight: 700; }
+  .merchant-picker-close {
+    font-size: 24px;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .merchant-picker-list {
+    overflow-y: auto;
+    padding: 8px 16px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .merchant-picker-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 8px 2px 4px;
+  }
+  .merchant-pick-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .merchant-pick-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .merchant-pick-item.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: var(--bg);
+  }
+  .merchant-pick-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .merchant-pick-info { flex: 1; min-width: 0; }
+  .merchant-pick-name { font-weight: 600; font-size: 14px; }
+  .merchant-pick-addr {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .merchant-pick-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .merchant-pick-dist { font-size: 12px; color: var(--orange); }
+  .merchant-pick-stock { font-size: 12px; font-weight: 600; }
+  .merchant-pick-stock.in { color: var(--primary); }
+  .merchant-pick-stock.out { color: var(--red); }
+
+  /* select field (clickable) */
+  .select-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .select-chevron { width: 16px; height: 16px; color: var(--text-secondary); flex-shrink: 0; }
+
   /* ===== QR Code Modal ===== */
   .qr-modal-content {
     width: 75%;
@@ -1791,6 +1904,17 @@
         <button class="modal-btn modal-btn-secondary" onclick="closeCancelModal()">再想想</button>
         <button class="modal-btn modal-btn-primary" onclick="doCancelAppointment()" style="background:var(--red);">确认取消</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Merchant Picker (bottom sheet) -->
+  <div class="merchant-picker-overlay" id="merchantPicker" onclick="closeMerchantPicker()">
+    <div class="merchant-picker-sheet" onclick="event.stopPropagation()">
+      <div class="merchant-picker-header">
+        <div class="merchant-picker-title">选择预约商家</div>
+        <button class="merchant-picker-close" onclick="closeMerchantPicker()">×</button>
+      </div>
+      <div class="merchant-picker-list" id="merchantPickerList"></div>
     </div>
   </div>
 
@@ -2597,7 +2721,10 @@
       <!-- Merchant -->
       <div class="form-group">
         <div class="form-label">预约商家 <span class="required">*</span></div>
-        <input class="form-input" type="text" placeholder="请选择商家" id="appointMerchant" value="仁济诊所(浦东店)" readonly>
+        <div class="form-input select-field" id="appointMerchant" onclick="showMerchantPicker()">
+          <span id="appointMerchantText">仁济诊所(浦东店)</span>
+          <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
       </div>
 
       <!-- Name -->
@@ -3773,7 +3900,7 @@ function goAppointmentWithMerchant() {
     document.getElementById('appointDrug').value = drug.name + ' ' + drug.spec2;
   }
   if (merchant) {
-    document.getElementById('appointMerchant').value = merchant.name;
+    document.getElementById('appointMerchantText').textContent = merchant.name;
   }
   showPage('appointment');
 }
@@ -3792,7 +3919,7 @@ function bookDrugAtMerchant(drugId, merchantId) {
     document.getElementById('appointDrug').value = drug.name + ' ' + drug.spec2;
   }
   if (merchant) {
-    document.getElementById('appointMerchant').value = merchant.name;
+    document.getElementById('appointMerchantText').textContent = merchant.name;
   }
   pageHistory.push(currentPage);
   showPage('appointment');
@@ -3898,6 +4025,50 @@ function prefillAppointment() {
   }
   const qtyEl = document.getElementById('appointQty');
   if (qtyEl) qtyEl.textContent = '1';
+}
+
+// ===== Merchant Picker =====
+function showMerchantPicker() {
+  const drug = drugsData.find(d => d.id === currentDrugId);
+  const inStockIds = (drug && drug.merchants) ? drug.merchants : [];
+  // 离我最近的 5 个商家（按 distNum 升序）
+  const nearest = merchantsData.slice().sort((a, b) => a.distNum - b.distNum).slice(0, 5);
+  let html = '<div class="merchant-picker-hint">已按距离为您推荐最近的 5 家门店，仅「有货」门店可预约</div>';
+  nearest.forEach(m => {
+    const hasStock = inStockIds.includes(m.id);
+    const selected = (m.id === currentMerchantId);
+    html += '<div class="merchant-pick-item' + (selected ? ' selected' : '') + (hasStock ? '' : ' disabled') + '"'
+      + (hasStock ? ' onclick="selectMerchant(' + m.id + ')"' : '') + '>'
+      + '<div class="merchant-pick-avatar" style="background:' + m.iconBg + ';">' + m.icon + '</div>'
+      + '<div class="merchant-pick-info">'
+      + '<div class="merchant-pick-name">' + m.name + '</div>'
+      + '<div class="merchant-pick-addr">' + m.addr + '</div>'
+      + '</div>'
+      + '<div class="merchant-pick-right">'
+      + '<div class="merchant-pick-dist">距您 ' + m.distance + '</div>'
+      + '<div class="merchant-pick-stock ' + (hasStock ? 'in' : 'out') + '">' + (hasStock ? '有货' : '无货') + '</div>'
+      + '</div></div>';
+  });
+  document.getElementById('merchantPickerList').innerHTML = html;
+  document.getElementById('merchantPicker').classList.add('show');
+}
+
+function selectMerchant(id) {
+  const merchant = merchantsData.find(m => m.id === id);
+  if (!merchant) return;
+  const drug = drugsData.find(d => d.id === currentDrugId);
+  if (drug && drug.merchants && !drug.merchants.includes(id)) {
+    showToast('该门店暂无可预约药品');
+    return;
+  }
+  currentMerchantId = id;
+  const t = document.getElementById('appointMerchantText');
+  if (t) t.textContent = merchant.name;
+  closeMerchantPicker();
+}
+
+function closeMerchantPicker() {
+  document.getElementById('merchantPicker').classList.remove('show');
 }
 
 function submitAppointment() {
