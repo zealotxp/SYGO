@@ -1,5 +1,8 @@
 # 更新记录
 
+## [1.3.7] - 2026-07-21
+- v1.3.7 清理误入库的临时验证文件(_test_ordersearch.html/_ordersearch_dom.html)
+
 ## [1.3.6] - 2026-07-21
 - v1.3.6 商家订单页顶部新增姓名/手机号搜索框(merchantOrderSearch + searchMerchantOrder)，renderMerchantOrders 增加关键字过滤(姓名或手机号子串)，空结果提示改为未找到匹配的预约记录，复用 m-prod-search 样式
 
