@@ -1,5 +1,10 @@
 # 更新记录
 
+## [1.1.1] - 2026-07-21
+- 预约购药页新增「药品数量」步进选择器（−/＋，范围 1~99，默认 1），提交成功提示展示数量
+- 登录页新增手机号输入框，登录时记录用于登录的手机号（loginPhone）；进入预约页时自动填入该手机号并校验
+- showPage 切换到 appointment 时调用 prefillAppointment() 重置数量为 1 并自动填手机号，覆盖全部入口（含登录后跳转）
+
 ## [1.1.0] - 2026-07-21
 - 商家详情页：移除底部「立即预约」固定操作栏（.bottom-action-bar）
 - 在售药品列表每行右侧新增「预约」按钮，点击跳转预约页并预填该药品与商家（bookDrugAtMerchant(drugId,merchantId)），按钮 onclick 用 event.stopPropagation 避免触发行跳转
