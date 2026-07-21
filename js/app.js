@@ -1416,10 +1416,12 @@ function renderMerchantOrders() {
   listEl.innerHTML = filtered.map(o => `
     <div class="m-order-item">
       <div class="m-order-top"><span class="m-order-no">单号：${escHtml(o.orderNo)}</span><span class="m-order-qty">${escHtml(o.qty)} 份</span></div>
-      <div class="m-order-row"><span>用户</span><b>${escHtml(o.userName)}</b></div>
-      <div class="m-order-row"><span>手机号</span><b>${escHtml(o.phone)}</b></div>
-      <div class="m-order-row"><span>预约药品</span><b>${escHtml(o.drugName)}</b></div>
-      <div class="m-order-row"><span>预约时间</span><b>${escHtml(o.time)}</b></div>
+      <div class="m-order-grid">
+        <div class="m-order-cell"><span class="k">用户</span><b class="v">${escHtml(o.userName)}</b></div>
+        <div class="m-order-cell"><span class="k">手机</span><b class="v">${escHtml(o.phone)}</b></div>
+        <div class="m-order-cell m-span2"><span class="k">预约药品</span><b class="v">${escHtml(o.drugName)}</b></div>
+        <div class="m-order-cell m-span2"><span class="k">预约时间</span><b class="v">${escHtml(o.time)}</b></div>
+      </div>
     </div>`).join('');
 }
 function filterMerchantOrdersRange() {
