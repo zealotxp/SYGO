@@ -1,5 +1,9 @@
 # 更新记录
 
+## [1.0.9] - 2026-07-21
+- 药品详情页「药品介绍」区块改为药品占位图画廊：移除文字介绍，展示 6 张药品占位图（images/drug1~6.jpg，3 列网格，圆角封面）
+- goDrugDetail 不再拼装 indications/usage/contraindications/precautions 富文本，改为渲染 .drug-intro-gallery
+
 ## [1.0.8] - 2026-07-21
 - 收紧首页元素间距，确保首屏可见 banner + 4 个主推药品 + 1 个附近商家
 - 搜索栏/定位栏 padding 下调；轮播高度 160→110px；section-header padding 20/12→12/8；分类TAB padding 10/4→8/2；药品图 82→70px；商家卡 padding 14→10、头像 72→64px

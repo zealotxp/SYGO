@@ -646,6 +646,27 @@
   .drug-info-content p:last-child { margin-bottom: 0; }
   .drug-info-content p b { color: var(--text); font-weight: 600; }
 
+  /* ===== Drug intro placeholder gallery ===== */
+  .drug-intro-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .drug-intro-thumb {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .drug-intro-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   /* ===== Nearby Merchant List ===== */
   .nearby-merchant-section {
     background: white;
@@ -3596,14 +3617,15 @@ function goDrugDetail(id) {
   document.getElementById('drugDetailSpec').textContent = drug.spec;
   document.getElementById('drugDetailSpec2').textContent = drug.spec2;
 
-  // Update info section: 合并为单个「药品介绍」富文本
-  let introHtml = '';
-  if (drug.indications) introHtml += '<p><b>适应症：</b>' + drug.indications + '</p>';
-  if (drug.usage) introHtml += '<p><b>用法用量：</b>' + drug.usage + '</p>';
-  if (drug.contraindications) introHtml += '<p><b>禁忌：</b>' + drug.contraindications + '</p>';
-  if (drug.precautions) introHtml += '<p><b>注意事项：</b>' + drug.precautions + '</p>';
+  // Update info section: 药品介绍下方放几个药品占位图（不再显示文字）
+  const placeholderImgs = ['drug1.jpg','drug2.jpg','drug3.jpg','drug4.jpg','drug5.jpg','drug6.jpg'];
+  let galleryHtml = '<div class="drug-intro-gallery">';
+  placeholderImgs.forEach(src => {
+    galleryHtml += '<div class="drug-intro-thumb"><img src="images/' + src + '" alt="药品占位图" loading="lazy"></div>';
+  });
+  galleryHtml += '</div>';
   const introEl = document.getElementById('drugDetailIntro');
-  if (introEl) introEl.innerHTML = introHtml || '<p>暂无介绍</p>';
+  if (introEl) introEl.innerHTML = galleryHtml;
 
   // Update nearby merchants section
   const nearbySection = document.querySelector('#drugDetailPage .nearby-merchant-section');
