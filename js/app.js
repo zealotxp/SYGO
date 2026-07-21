@@ -51,6 +51,11 @@ function initSwiper() {
 }
 
 // ===== Date Selector =====
+function ymd(d) {
+  const p = n => (n < 10 ? '0' : '') + n;
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
 function initDateSelector() {
   const container = document.getElementById('dateSelector');
   const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
@@ -61,6 +66,7 @@ function initDateSelector() {
     const item = document.createElement('div');
     item.className = 'date-item' + (i === 0 ? ' selected' : '');
     item.innerHTML = `<span class="weekday">${i === 0 ? '今天' : weekdays[d.getDay()]}</span><span class="day">${d.getDate()}</span>`;
+    item.dataset.date = ymd(d);
     item.onclick = function() {
       document.querySelectorAll('.date-item').forEach(el => el.classList.remove('selected'));
       this.classList.add('selected');
@@ -945,7 +951,7 @@ function submitAppointment() {
   const drug = drugsData.find(x => x.id === currentDrugId);
   const merchant = merchantsData.find(x => x.id === currentMerchantId);
   const dateItem = document.querySelector('.date-item.selected');
-  const dateText = dateItem ? (dateItem.querySelector('.weekday').textContent + ' ' + dateItem.querySelector('.day').textContent) : '';
+  const dateText = dateItem && dateItem.dataset.date ? dateItem.dataset.date : '';
   const timeText = selectedTime ? selectedTime.textContent.trim() : '';
   const time = (dateText + ' ' + timeText).trim() || '待定';
 
@@ -1012,9 +1018,9 @@ function seedAppointments() {
   const now = Date.now();
   const DAY = 86400000;
   const seed = [
-    { orderNo: 'YY20260721001', drugName: '静注人免疫球蛋白(pH4)', drugSpec: '2.5g/50ml', img: 'images/drug1.jpg', merchantName: '仁济诊所(浦东店)', time: '今天 21 14:00', qty: 2, status: 'success', createdAt: now - 3600000 },
-    { orderNo: 'YY20260720003', drugName: '人血白蛋白(安博灵)', drugSpec: '10g/50ml', img: 'images/drug3.jpg', merchantName: '国大诊所(徐汇店)', time: '昨天 20 10:00', qty: 1, status: 'success', createdAt: now - DAY },
-    { orderNo: 'YY20260609005', drugName: '人血白蛋白(蜀阳)', drugSpec: '10g/50ml', img: 'images/drug5.jpg', merchantName: '益丰诊所(静安店)', time: '上月12日 19 15:00', qty: 3, status: 'success', createdAt: now - 40 * DAY }
+    { orderNo: 'YY20260721001', drugName: '静注人免疫球蛋白(pH4)', drugSpec: '2.5g/50ml', img: 'images/drug1.jpg', merchantName: '仁济诊所(浦东店)', time: ymd(new Date(now)) + ' 14:00', qty: 2, status: 'success', createdAt: now - 3600000 },
+    { orderNo: 'YY20260720003', drugName: '人血白蛋白(安博灵)', drugSpec: '10g/50ml', img: 'images/drug3.jpg', merchantName: '国大诊所(徐汇店)', time: ymd(new Date(now - DAY)) + ' 10:00', qty: 1, status: 'success', createdAt: now - DAY },
+    { orderNo: 'YY20260609005', drugName: '人血白蛋白(蜀阳)', drugSpec: '10g/50ml', img: 'images/drug5.jpg', merchantName: '益丰诊所(静安店)', time: ymd(new Date(now - 40 * DAY)) + ' 15:00', qty: 3, status: 'success', createdAt: now - 40 * DAY }
   ];
   saveMyAppointments(seed);
 }
