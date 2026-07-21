@@ -776,6 +776,24 @@ function bookDrugAtMerchant(drugId, merchantId) {
 
 function goMyAppointments() { location.href = 'my-appointments.html'; }
 
+function goMerchantLogin() { location.href = 'merchant-login.html'; }
+
+function doMerchantLogin() {
+  const phone = document.getElementById('merchantLoginPhone');
+  const pwd = document.getElementById('merchantLoginPwd');
+  const phoneVal = phone ? phone.value.trim() : '';
+  if (!phoneVal || !/^1[3-9]\d{9}$/.test(phoneVal)) {
+    showToast('请输入正确的商家手机号');
+    return;
+  }
+  if (!pwd || !pwd.value) {
+    showToast('请输入登录密码');
+    return;
+  }
+  showToast('商家登录成功');
+  setTimeout(() => { location.href = 'profile.html'; }, 1200);
+}
+
 function goSearch() { location.href = 'search.html'; }
 
 // ===== Search =====

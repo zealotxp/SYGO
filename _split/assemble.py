@@ -42,6 +42,7 @@ PAGES = [
     ('agreement.html', 'agreementPage', '用户协议 - 上药GO', 'agreement', False, None, ['toast'], False, None),
     ('map-picker.html', 'mapPickerPage', '选择位置 - 上药GO', 'map-picker', False, None, ['toast'], True, None),
     ('login.html', 'loginPage', '登录 - 上药GO', 'login', False, None, ['toast'], False, None),
+    ('merchant-login.html', 'merchantLoginPage', '商家登录 - 上药GO', 'merchant-login', False, None, ['toast'], False, None),
 ]
 
 for (file, src, title, page, hasTab, tabActive, modals, leaflet, extra) in PAGES:
