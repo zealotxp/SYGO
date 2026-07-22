@@ -10,7 +10,10 @@
         <span class="academic-search-go" onclick="goAcademicSearch()">搜索</span>
       </div>
       <div class="academic-cat-bar">
-        <div class="academic-cat-chip" id="academicCatChip" onclick="openAcademicCategoryPicker()">全部分类</div>
+        <div class="academic-cat-scroll">
+          <div class="academic-cat-chip" id="academicCatChip" onclick="openAcademicCategoryPicker()">全部分类</div>
+        </div>
+        <button class="academic-cat-clear" id="academicCatClear" style="display:none" onclick="resetAcademicCategory()">清空筛选</button>
       </div>
     </div>
 

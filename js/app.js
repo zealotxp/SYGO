@@ -1745,13 +1745,11 @@ function academicCatPathNames(id){
 }
 function academicCardHTML(a){
   return `<div class="academic-card" onclick="goAcademicDetail('${a.id}')">
-    <div class="academic-cover" style="background:${a.bg}">${a.emoji}</div>
-    <div class="academic-card-body">
-      <div class="academic-card-title">${a.title}</div>
-      <div class="academic-card-meta">
-        <span class="academic-card-date">${a.date}</span>
-        <span class="academic-card-cat">${academicCatName(a.cat)}</span>
-      </div>
+    <div class="academic-card-title">${a.title}</div>
+    <div class="academic-card-meta">
+      <span class="academic-card-date">${a.date}</span>
+      <span class="academic-card-cat">${academicCatName(a.cat)}</span>
+      <span class="academic-card-author">${a.author}</span>
     </div>
   </div>`;
 }
@@ -1769,6 +1767,8 @@ function updateAcademicCatChip(){
   const chip = document.getElementById('academicCatChip');
   if(!chip) return;
   chip.textContent = academicCat ? academicCatPathNames(academicCat).join(' / ') : '全部分类';
+  const clearBtn = document.getElementById('academicCatClear');
+  if(clearBtn) clearBtn.style.display = academicCat ? 'inline-block' : 'none';
 }
 function goAcademicSearch(q){
   const s = (q != null ? q : (document.getElementById('academicSearchInput')?.value || '')).trim();
