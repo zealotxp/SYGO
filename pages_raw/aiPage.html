@@ -1,0 +1,88 @@
+<div class="page" id="aiPage">
+  <!-- ===== Top header ===== -->
+  <div class="ai-header">
+    <div class="ai-header-side ai-menu-btn" onclick="openAIHistory()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </div>
+    <div class="ai-header-title" onclick="document.getElementById('aiModelSwitch').style.display='flex'">
+      <div class="ai-title-line">谌元芳</div>
+      <div class="ai-sub-line">循证医学智能体 <span class="ai-caret">▾</span></div>
+    </div>
+    <div class="ai-header-side ai-service-btn" onclick="showToast('客服功能开发中')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    </div>
+  </div>
+
+  <!-- ===== Model switch popover (cosmetic) ===== -->
+  <div class="ai-model-switch" id="aiModelSwitch" style="display:none" onclick="this.style.display='none'">
+    <div class="ai-model-row active">谌元芳 · 循证医学智能体</div>
+    <div class="ai-model-row disabled">影像辅助（即将上线）</div>
+    <div class="ai-model-row disabled">病历摘要（即将上线）</div>
+  </div>
+
+  <!-- ===== Welcome screen ===== -->
+  <div class="ai-welcome" id="aiWelcome">
+    <div class="ai-welcome-top">
+      <div class="ai-welcome-text">
+        <div class="ai-welcome-hi">Hi，我是循证医学智能体</div>
+        <div class="ai-welcome-sub">整合海量权威文献、最新临床指南</div>
+      </div>
+      <div class="ai-robot">
+        <div class="ai-robot-emoji">🤖</div>
+        <div class="ai-robot-plus">+</div>
+      </div>
+    </div>
+
+    <div class="ai-suggest">
+      <div class="ai-suggest-label"><span class="ai-bar"></span>你可以这样问</div>
+      <div class="ai-suggest-list" id="aiSuggestList"></div>
+    </div>
+
+    <div class="ai-disclaimer">
+      所有内容均由AI生成，仅供参考，不代表我们的态度或观点。本产品属于人工智能辅助诊疗应用，作为辅助诊疗和临床决策支持系统，不属于诊疗活动，不能作为临床最终诊疗方案，仅作为临床辅助诊疗和参考，最终诊疗方案必须由有资质的临床医师确定。我们不会将数据用于模型训练，在您授权之前不会发给第三方。
+    </div>
+    <div class="ai-medclaw">🐾 MedClaw</div>
+  </div>
+
+  <!-- ===== Chat messages view ===== -->
+  <div class="ai-messages" id="aiMessages" style="display:none"></div>
+
+  <!-- ===== Bottom input bar ===== -->
+  <div class="ai-input-bar">
+    <input type="file" id="aiFileInput" accept="image/*" style="display:none" onchange="onAIFileSelected(event)">
+    <div class="ai-input-row">
+      <div class="ai-icon-btn" onclick="document.getElementById('aiFileInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </div>
+      <div class="ai-deep-pill" id="aiDeepPill" onclick="toggleAIDeepSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        深度检索
+      </div>
+      <div class="ai-text-input-wrap">
+        <textarea id="aiTextInput" placeholder="有问题，尽管问" rows="1" oninput="onAIInputChange()" onkeydown="onAIInputKeydown(event)"></textarea>
+        <div class="ai-image-preview" id="aiImagePreview" style="display:none">
+          <img id="aiImagePreviewImg" src="" alt="待发送图片">
+          <span class="ai-image-close" onclick="clearAIAttachedImage()">×</span>
+        </div>
+      </div>
+      <div class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== History drawer (slide from left) ===== -->
+  <div class="modal-overlay ai-drawer-mask" id="aiDrawerMask" style="display:none" onclick="closeAIHistory()">
+    <div class="ai-drawer" onclick="event.stopPropagation()">
+      <div class="ai-drawer-head">
+        <div class="ai-drawer-title">历史对话</div>
+        <div class="ai-drawer-new" onclick="newAIConversation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          新建对话
+        </div>
+      </div>
+      <div class="ai-drawer-list" id="aiDrawerList"></div>
+      <div class="ai-drawer-foot">所有对话仅保存在本机</div>
+    </div>
+  </div>
+</div>

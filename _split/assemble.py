@@ -16,6 +16,10 @@ TABBAR = '''  <div class="tab-bar" id="tabBar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>学术</span>
     </div>
+    <div class="tab-item{ai}" onclick="switchTab('ai')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a1.5 1.5 0 1 1 1.5 1.5M15 9.5a1.5 1.5 0 1 1 1.5 1.5"/><path d="M8 15c1 1.3 2.5 2 4 2s3-.7 4-2"/></svg>
+      <span>AI</span>
+    </div>
     <div class="tab-item{appt}" onclick="goMyAppointments()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       <span>预约</span>
@@ -33,6 +37,7 @@ PAGES = [
     ('academic.html', 'academicPage', '学术园地 - 上药GO', 'academic', True, 'academic', ['toast'], False, None),
     ('academic-detail.html', 'academicDetailPage', '文章详情 - 上药GO', 'academic-detail', False, None, ['toast'], False, None),
     ('academic-search.html', 'academicSearchPage', '文章搜索 - 上药GO', 'academic-search', False, None, ['toast'], False, None),
+    ('ai.html', 'aiPage', 'AI 智能体 - 上药GO', 'ai', True, 'ai', ['toast','imagePreviewModal'], False, None),
     ('all-drugs.html', 'allDrugsPage', '全部药品 - 上药GO', 'allDrugs', False, None, ['toast'], False, None),
     ('all-merchants.html', 'allMerchantsPage', '全部商家 - 上药GO', 'allMerchants', False, None, ['locationModal','toast'], False, None),
     ('drug-detail.html', 'drugDetailPage', '药品详情 - 上药GO', 'drug-detail', False, None, ['qrModal','toast'], False, ('onclick="goAppointment()"', 'onclick="goAppointmentForDrug()"')),
@@ -65,7 +70,7 @@ for (file, src, title, page, hasTab, tabActive, modals, leaflet, extra) in PAGES
     modal_html = '\n'.join(MOD(m) for m in modals)
     tabbar = ''
     if hasTab:
-        a = {'home':'','academic':'','appt':'','profile':''}
+        a = {'home':'','academic':'','ai':'','appt':'','profile':''}
         if tabActive: a[tabActive] = ' active'
         tabbar = TABBAR.format(**a)
     head = '''<!DOCTYPE html>

@@ -512,7 +512,7 @@ const PAGE_FILE = {
 };
 function getParam(name){ const p = new URLSearchParams(location.search); return p.get(name); }
 function showPage(pageId){ const f = PAGE_FILE[pageId]; if (f) location.href = f; }
-function switchTab(tab){ const map={home:'index.html',search:'search.html',academic:'academic.html',myAppointments:'my-appointments.html',profile:'profile.html'}; location.href = map[tab] || 'index.html'; }
+function switchTab(tab){ const map={home:'index.html',search:'search.html',academic:'academic.html',ai:'ai.html',myAppointments:'my-appointments.html',profile:'profile.html'}; location.href = map[tab] || 'index.html'; }
 function goHome(){ location.href = 'index.html'; }
 function goBack(){ if (history.length > 1) history.back(); else location.href = 'index.html'; }
 
@@ -1955,6 +1955,330 @@ function closeArticlePreview(){
   if(m) m.classList.remove('show');
 }
 
+// ============== AI 医疗智能体 ==============
+let aiConvs = [];
+let aiCurrentId = null;
+let aiDeep = false;
+let aiAttachedImage = null; // dataURL
+let aiStreaming = false;
+
+const AI_SUGGESTIONS = [
+  '非小细胞肺癌 EGFR 罕见突变的靶向治疗',
+  '三阴性乳腺癌的免疫治疗进展',
+  'ANCA 相关性肾小球肾炎早期诊断的思路是什么，如何与其他疾病鉴别',
+  '高血压合并糖尿病患者首选哪一类降压药？',
+  '儿童急性淋巴细胞白血病的最新治疗方案',
+  '肝硬化合并上消化道出血的急救处理'
+];
+
+const AI_STORE_KEY = 'shangyao_ai_convs_v1';
+
+function loadAIConvs(){
+  try {
+    const raw = localStorage.getItem(AI_STORE_KEY);
+    aiConvs = raw ? JSON.parse(raw) : [];
+  } catch(e) { aiConvs = []; }
+  if(!Array.isArray(aiConvs)) aiConvs = [];
+}
+function saveAIConvs(){
+  try { localStorage.setItem(AI_STORE_KEY, JSON.stringify(aiConvs)); } catch(e) {}
+}
+function getCurrentConv(){
+  return aiConvs.find(c => c.id === aiCurrentId) || null;
+}
+function newAIConversation(){
+  if(aiStreaming){ showToast('正在生成回复，请稍候'); return; }
+  const c = { id: 'aic' + Date.now(), title: '新对话', messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  aiConvs.unshift(c);
+  aiCurrentId = c.id;
+  saveAIConvs();
+  renderAI();
+  closeAIHistory();
+  const t = document.getElementById('aiTextInput');
+  if(t) setTimeout(() => t.focus(), 50);
+}
+function switchAIConversation(id){
+  if(aiStreaming){ showToast('正在生成回复，请稍候'); return; }
+  aiCurrentId = id;
+  saveAIConvs();
+  renderAI();
+  closeAIHistory();
+}
+function deleteAIConversation(id){
+  if(!confirm('确定删除该对话？')) return;
+  aiConvs = aiConvs.filter(c => c.id !== id);
+  if(aiCurrentId === id) aiCurrentId = null;
+  saveAIConvs();
+  renderAI();
+  renderAIHistory();
+}
+function clearAllAIHistory(){
+  if(!aiConvs.length){ showToast('暂无历史对话'); return; }
+  if(!confirm('确定清空全部历史对话？')) return;
+  aiConvs = [];
+  aiCurrentId = null;
+  saveAIConvs();
+  renderAI();
+  renderAIHistory();
+}
+
+function renderAI(){
+  // Suggestion list
+  const sl = document.getElementById('aiSuggestList');
+  if(sl) sl.innerHTML = AI_SUGGESTIONS.map(q => `<div class="ai-suggest-item" onclick="askAISuggest('${q.replace(/'/g,"\\'")}')">${q}<span class="ai-suggest-arrow">›</span></div>`).join('');
+
+  const c = getCurrentConv();
+  const welcome = document.getElementById('aiWelcome');
+  const msgs = document.getElementById('aiMessages');
+  if(!c || !c.messages.length){
+    if(welcome) welcome.style.display = 'block';
+    if(msgs) msgs.style.display = 'none';
+    return;
+  }
+  if(welcome) welcome.style.display = 'none';
+  if(msgs) msgs.style.display = 'block';
+  msgs.innerHTML = c.messages.map(renderAIMessageHTML).join('');
+  scrollAIMessagesToBottom();
+}
+function renderAIMessageHTML(m){
+  const time = m.time ? `<div class="ai-msg-time">${m.time}</div>` : '';
+  if(m.role === 'user'){
+    const img = m.image ? `<div class="ai-msg-image"><img src="${m.image}" onclick="openImagePreview('${m.image}')" alt="图片"></div>` : '';
+    const txt = m.text ? `<div class="ai-msg-bubble user">${escapeAIHTML(m.text)}</div>` : '';
+    return `<div class="ai-msg ai-msg-user">${img}${txt}${time}</div>`;
+  }
+  // AI
+  const txt = m.text ? `<div class="ai-msg-bubble ai">${m.text}</div>` : '';
+  return `<div class="ai-msg ai-msg-ai">
+    <div class="ai-msg-avatar">🤖</div>
+    <div class="ai-msg-body">${txt}${time}</div>
+  </div>`;
+}
+function escapeAIHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function scrollAIMessagesToBottom(){
+  const msgs = document.getElementById('aiMessages');
+  if(!msgs) return;
+  // Scroll the .app-container (since .ai-messages is inside the flex container)
+  setTimeout(() => { window.scrollTo(0, document.body.scrollHeight); }, 30);
+}
+function formatAITime(ts){
+  const d = new Date(ts || Date.now());
+  const p = n => (n < 10 ? '0' + n : '' + n);
+  return p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function renderAIHistory(){
+  const list = document.getElementById('aiDrawerList');
+  if(!list) return;
+  if(!aiConvs.length){
+    list.innerHTML = '<div class="ai-drawer-empty">还没有历史对话<br>点击右上角"新建对话"开始</div>';
+    return;
+  }
+  list.innerHTML = aiConvs.map(c => {
+    const last = c.messages.length ? c.messages[c.messages.length - 1] : null;
+    const preview = last ? (last.role === 'user' ? (last.text || '[图片]') : (last.text || '').slice(0, 40)) : '空对话';
+    const isActive = c.id === aiCurrentId;
+    return `<div class="ai-drawer-item ${isActive ? 'active' : ''}" onclick="switchAIConversation('${c.id}')">
+      <div class="ai-drawer-item-title">${escapeAIHTML(c.title || '新对话')}</div>
+      <div class="ai-drawer-item-preview">${escapeAIHTML(preview)}</div>
+      <div class="ai-drawer-item-del" onclick="event.stopPropagation();deleteAIConversation('${c.id}')">×</div>
+    </div>`;
+  }).join('');
+}
+function openAIHistory(){
+  renderAIHistory();
+  const m = document.getElementById('aiDrawerMask');
+  if(m) m.style.display = 'flex';
+}
+function closeAIHistory(){
+  const m = document.getElementById('aiDrawerMask');
+  if(m) m.style.display = 'none';
+}
+
+function toggleAIDeepSearch(){
+  aiDeep = !aiDeep;
+  const p = document.getElementById('aiDeepPill');
+  if(p) p.classList.toggle('on', aiDeep);
+  showToast(aiDeep ? '已开启深度检索' : '已关闭深度检索');
+}
+
+function onAIInputChange(){
+  const t = document.getElementById('aiTextInput');
+  if(!t) return;
+  t.style.height = 'auto';
+  t.style.height = Math.min(t.scrollHeight, 96) + 'px';
+}
+function onAIInputKeydown(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendAIMessage();
+  }
+}
+
+function onAIFileSelected(e){
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ showToast('仅支持图片文件'); e.target.value = ''; return; }
+  if(f.size > 5 * 1024 * 1024){ showToast('图片大小不能超过 5MB'); e.target.value = ''; return; }
+  const fr = new FileReader();
+  fr.onload = ev => {
+    aiAttachedImage = ev.target.result;
+    const img = document.getElementById('aiImagePreviewImg');
+    if(img) img.src = aiAttachedImage;
+    const pv = document.getElementById('aiImagePreview');
+    if(pv) pv.style.display = 'block';
+  };
+  fr.readAsDataURL(f);
+  e.target.value = '';
+}
+function clearAIAttachedImage(){
+  aiAttachedImage = null;
+  const pv = document.getElementById('aiImagePreview');
+  if(pv) pv.style.display = 'none';
+  const img = document.getElementById('aiImagePreviewImg');
+  if(img) img.src = '';
+}
+
+function askAISuggest(q){
+  if(aiStreaming){ showToast('正在生成回复，请稍候'); return; }
+  const t = document.getElementById('aiTextInput');
+  if(t) t.value = q;
+  sendAIMessage();
+}
+
+function sendAIMessage(){
+  if(aiStreaming){ showToast('正在生成回复，请稍候'); return; }
+  const t = document.getElementById('aiTextInput');
+  const text = (t && t.value || '').trim();
+  const image = aiAttachedImage;
+  if(!text && !image){ showToast('请输入问题或选择图片'); return; }
+  // ensure a current conversation
+  let c = getCurrentConv();
+  if(!c){
+    c = { id: 'aic' + Date.now(), title: text ? text.slice(0, 24) : '图片对话', messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+    aiConvs.unshift(c);
+    aiCurrentId = c.id;
+  }
+  const userMsg = { role: 'user', text, image, time: formatAITime() };
+  c.messages.push(userMsg);
+  c.updatedAt = Date.now();
+  if(c.title === '新对话' && text){
+    c.title = text.slice(0, 24);
+  }
+  // Optimistic render
+  renderAI();
+  if(t){ t.value = ''; t.style.height = 'auto'; }
+  clearAIAttachedImage();
+  // Simulate AI thinking + streaming reply
+  streamAIReply(c, text, image);
+}
+
+function streamAIReply(conv, userText, userImage){
+  aiStreaming = true;
+  const msgs = document.getElementById('aiMessages');
+  if(msgs) msgs.style.display = 'block';
+  const welcome = document.getElementById('aiWelcome');
+  if(welcome) welcome.style.display = 'none';
+
+  // Typing indicator
+  const typingId = '__typing__';
+  const typingHTML = `<div class="ai-msg ai-msg-ai" id="${typingId}">
+    <div class="ai-msg-avatar">🤖</div>
+    <div class="ai-msg-body"><div class="ai-msg-bubble ai ai-typing"><span></span><span></span><span></span></div></div>
+  </div>`;
+  if(msgs) msgs.insertAdjacentHTML('beforeend', typingHTML);
+  scrollAIMessagesToBottom();
+
+  const replyText = composeAIReply(userText, userImage, conv);
+  const replyMsg = { role: 'ai', text: '', time: formatAITime() };
+  conv.messages.push(replyMsg);
+  conv.updatedAt = Date.now();
+
+  let i = 0;
+  const speed = userImage ? 28 : 22; // chars per tick
+  const tick = () => {
+    if(i >= replyText.length){
+      // remove typing indicator
+      const t = document.getElementById(typingId);
+      if(t) t.remove();
+      // rewrite the streaming bubble to its final HTML
+      renderAI();
+      aiStreaming = false;
+      saveAIConvs();
+      return;
+    }
+    i = Math.min(i + speed, replyText.length);
+    replyMsg.text = replyText.slice(0, i);
+    // Update only the last AI bubble in DOM
+    const last = msgs.querySelector('.ai-msg-ai:last-of-type .ai-msg-bubble');
+    if(last && last.classList.contains('ai-typing')) last.remove();
+    // Find or create the streaming bubble
+    let bubble = msgs.querySelector('.ai-msg-stream');
+    if(!bubble){
+      const aiMsgs = msgs.querySelectorAll('.ai-msg-ai');
+      const lastAi = aiMsgs[aiMsgs.length - 1];
+      if(lastAi){
+        const body = lastAi.querySelector('.ai-msg-body');
+        if(body){
+          body.insertAdjacentHTML('afterbegin', `<div class="ai-msg-bubble ai ai-msg-stream"></div>`);
+          bubble = body.querySelector('.ai-msg-stream');
+        }
+      }
+    }
+    if(bubble) bubble.innerHTML = escapeAIHTML(replyMsg.text) + '<span class="ai-cursor">▍</span>';
+    scrollAIMessagesToBottom();
+    setTimeout(tick, 30);
+  };
+  setTimeout(tick, 600);
+}
+
+function composeAIReply(userText, userImage, conv){
+  // Rule-based response: keyword + length-aware
+  const t = (userText || '').trim();
+  const hasImg = !!userImage;
+
+  if(hasImg && !t){
+    return '我已收到您上传的图片。提示：作为辅助诊疗系统，我无法对医学影像作直接诊断，但可以帮您解读报告中的关键术语、提示下一步需要关注的检查项目或与相关临床指南对应。请补充图片说明（检查类型/部位）或您想了解的问题，我会为您整理要点。';
+  }
+  if(hasImg && t){
+    return '已收到您上传的图片和文字问题"' + t.slice(0, 40) + '"。作为辅助诊疗工具，我不能直接读图诊断，但会基于您描述的问题和图中的关键信息给出循证要点与可参考的检查/分诊建议。如能补充报告类型（如 CT、MRI、超声、生化报告等）以及您关注的症状，我可以给出更精准的回应。';
+  }
+  // pure text
+  const lower = t.toLowerCase();
+  if(/^(你好|您好|hi|hello|嗨)/i.test(t)){
+    return '您好！我是循证医学智能体，可以帮您整理权威指南要点、解读诊疗思路、对比治疗方案。请告诉我您想了解的具体问题，例如某种疾病的最新治疗进展、药物选择或检查解读。';
+  }
+  if(/谢谢|感谢|thanks/i.test(t)){
+    return '不客气！如有进一步问题，例如具体剂量、联合方案或随访节点，随时告诉我。';
+  }
+  if(aiDeep){
+    return '【深度检索模式】基于您的问题"' + t + '"，我已检索近 5 年 Cochrane、PubMed 及主要中文核心期刊摘要。下面给出 5 条核心要点：\n\n1) 当前指南对您所述问题的Ⅰ类推荐与证据等级；\n2) 一线治疗方案及典型剂量/疗程；\n3) 替代方案与适用人群；\n4) 关键监测指标与不良反应管理；\n5) 与最新研究进展的衔接点。\n\n如需我把上述任一部分展开为完整循证摘要，请告诉我您优先关注的章节。';
+  }
+  if(/egfr|肺癌|非小细胞|突变/.test(t)){
+    return '非小细胞肺癌（NSCLC）EGFR 突变治疗要点（参考 CSCO/NCCN 指南）：\n\n• 常见突变（19del、L858R）首选第三代 EGFR-TKI 奥希替尼；\n• 罕见突变（G719X、L861Q、S768I）阿法替尼为优先推荐；\n• Exon 20 插入突变可考虑 amivantamab、mobocertinib 或含铂化疗；\n• 耐药后建议再次活检 + NGS，明确 T790M/C797S/小细胞转化等机制，再选后续方案。\n\n具体用药需结合 PS 评分、合并症与药物可及性，最终方案请主管医师确认。';
+  }
+  if(/三阴|乳腺癌|tnbc|免疫/.test(t)){
+    return '三阴性乳腺癌（TNBC）免疫治疗要点：\n\n• 早期高危 TNBC：新辅助化疗 + 帕博利珠单抗（KEYNOTE-522 方案），术后继续 pembro 辅助；\n• 转移性 PD-L1 CPS≥10 TNBC：化疗 + pembro 一线；\n• 转移性 gBRCA 突变：PARP 抑制剂（奥拉帕利/他拉唑帕利）；\n• 抗体偶联药：sacituzumab govitecan、datopotamab deruxtecan 用于后线。\n\n用药前需评估 PD-L1 表达、BRCA 状态、心功能与基线影像。';
+  }
+  if(/anca|肾小球|鉴别/.test(t)){
+    return 'ANCA 相关性血管炎（AAV）肾损害早期诊断思路：\n\n1) 临床线索：血尿/蛋白尿/急进性肾功能下降 + 肺/耳鼻喉/皮肤多系统受累；\n2) 实验室：ANCA 检测（MPO/PR3）、尿沉渣、SCr/eGFR、补体（多正常）；\n3) 鉴别：抗 GBM 病、IgA 肾病、狼疮性肾炎、紫癜性肾炎、感染性心内膜炎肾损害、药物性；\n4) 必要时肾活检：寡免疫复合物新月体肾炎；\n5) 治疗：诱导期（糖皮质激素 + 环磷酰胺或利妥昔单抗），维持期（硫唑嘌呤/吗替麦考酚酯/利妥昔单抗）。\n\n建议联合肾内科与风湿免疫科共同管理。';
+  }
+  if(/高血压|糖尿病|降压/.test(t)){
+    return '高血压合并糖尿病患者降压药选择：\n\n• 首选：ACEI 或 ARB（如缬沙坦、厄贝沙坦、培哚普利）——降压同时保护肾脏、减少蛋白尿；\n• 二线：CCB（氨氯地平）、小剂量噻嗪类；\n• 慎用：β受体阻滞剂（可能掩盖低血糖症状、影响糖脂代谢）；\n• 目标：一般<130/80 mmHg，老年/虚弱者适当放宽。\n\n用药前需查肾素-醛固酮、肾功能、电解质。';
+  }
+  if(/儿童|急性淋巴|白血病/.test(t)){
+    return '儿童急性淋巴细胞白血病（ALL）最新治疗要点：\n\n• 危险分层：年龄、初诊 WBC、染色体/分子（NUTD15、Ph-like、IKZF1）、MRD；\n• 化疗：VDLP / CAM 等方案，按危险度调整强度；\n• 靶向：Ph+ ALL 加 TKI（伊马替尼/达沙替尼）；\n• 免疫：CD19/CD22 双靶（blinatumomab、inotuzumab）、CAR-T 用于难治复发；\n• 支持治疗：感染防控、肿瘤溶解综合征预防、营养心理。\n\n强烈建议在儿童血液病中心规范化疗与全程管理。';
+  }
+  if(/肝硬化|上消化|出血|急救/.test(t)){
+    return '肝硬化合并上消化道出血急救流程：\n\n1) 评估气道、呼吸、循环，建立两条静脉通路；\n2) 液体复苏（晶体优先），目标 MAP≥65 mmHg；Hb 70-80 g/L 输血阈值；\n3) 早期（<12h）急诊内镜：食管胃底静脉曲张破裂首选内镜下套扎/组织胶；\n4) 药物：生长抑素/奥曲肽 + 特利加压素，急性期持续 3-5 天；\n5) 抗菌：头孢曲松 1g/d 预防 SBP；\n6) 难控制出血：TIPS 备选；\n7) 后续：非选择性 β 受体阻滞剂（普萘洛尔/卡维地洛）二级预防。\n\n需重症监护、内镜、介入、肝病中心多学科联动。';
+  }
+  // fallback
+  if(t.length <= 4){
+    return '您的问题"' + t + '"较为简短，能再多描述一些吗？例如：\n• 涉及的疾病/症状；\n• 关注的是诊断、治疗还是随访；\n• 患者的关键基线（年龄、合并症、用药）。\n\n提供越具体，我能给到越贴近指南的要点。';
+  }
+  return '我已记录您的问题"' + t.slice(0, 60) + '"。作为辅助诊疗智能体，我从循证医学角度整理如下要点：\n\n1) 关键定义/诊断标准（按权威指南：CSCO/NCCN/ESC 等）；\n2) 一线方案与替代方案的差异、适用人群；\n3) 需重点监测的指标与不良反应管理；\n4) 随访与生活方式建议。\n\n如需我对上述任一部分展开为循证摘要，或对比具体药物剂量、特殊人群（老年/妊娠/肝肾不全）调整方案，请直接告诉我章节或补充背景。';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'home') {
@@ -1972,6 +2296,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (page === 'my-appointments') {
     renderMyAppointments();
     updateApptOrderTrigger();
+  } else if (page === 'ai') {
+    loadAIConvs();
+    renderAI();
   } else if (page === 'map-picker') {
     setTimeout(() => initMapPicker(), 200);
   } else if (page === 'merchant') {
