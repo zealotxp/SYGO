@@ -32,20 +32,10 @@
       </div>
     </div>
 
-    <div class="merchant-menu">
-      <div class="merchant-menu-item" onclick="goHome()">
-        <div class="merchant-menu-icon" style="background:#E8F0FE;">🏠</div>
-        <div class="merchant-menu-text">返回首页</div>
-        <span class="profile-menu-arrow">›</span>
-      </div>
+    <div class="merchant-menu-card">
       <div class="merchant-menu-item" onclick="goMerchantOrders()">
         <div class="merchant-menu-icon" style="background:var(--primary-light);">📋</div>
         <div class="merchant-menu-text">预约订单</div>
-        <span class="profile-menu-arrow">›</span>
-      </div>
-      <div class="merchant-menu-item" onclick="goMerchantStats()">
-        <div class="merchant-menu-icon" style="background:#E8F0FE;">📊</div>
-        <div class="merchant-menu-text">订单统计</div>
         <span class="profile-menu-arrow">›</span>
       </div>
       <div class="merchant-menu-item" onclick="goMerchantProducts()">
@@ -53,11 +43,22 @@
         <div class="merchant-menu-text">商品管理</div>
         <span class="profile-menu-arrow">›</span>
       </div>
+    </div>
+
+    <div class="merchant-menu-card">
+      <div class="merchant-menu-item" onclick="goMerchantStats()">
+        <div class="merchant-menu-icon" style="background:#E8F0FE;">📊</div>
+        <div class="merchant-menu-text">订单统计</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
       <div class="merchant-menu-item" onclick="goMerchantStore()">
         <div class="merchant-menu-icon" style="background:#FFF3E8;">🏪</div>
         <div class="merchant-menu-text">店铺信息</div>
         <span class="profile-menu-arrow">›</span>
       </div>
+    </div>
+
+    <div class="merchant-menu-card">
       <div class="merchant-menu-item" onclick="goMerchantChangePassword()">
         <div class="merchant-menu-icon" style="background:#F3E8FC;">🔑</div>
         <div class="merchant-menu-text">修改密码</div>
@@ -66,6 +67,14 @@
       <div class="merchant-menu-item" onclick="merchantLogout()">
         <div class="merchant-menu-icon" style="background:#FCE8E8;">🚪</div>
         <div class="merchant-menu-text">退出登录</div>
+        <span class="profile-menu-arrow">›</span>
+      </div>
+    </div>
+
+    <div class="merchant-menu-card merchant-menu-card-solo">
+      <div class="merchant-menu-item" onclick="goHome()">
+        <div class="merchant-menu-icon" style="background:#E8F0FE;">🏠</div>
+        <div class="merchant-menu-text">返回首页</div>
         <span class="profile-menu-arrow">›</span>
       </div>
     </div>
