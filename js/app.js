@@ -1088,6 +1088,7 @@ function closeSuccessModal() {
 const APPOINTMENTS_KEY = 'sygo_appointments';
 let currentOrderStart = '';
 let currentOrderEnd = '';
+let apPickerStart = '', apPickerEnd = '', apPickerTarget = 'start', apPickerMonth = new Date();
 
 function getMyAppointments() {
   try {
@@ -1160,22 +1161,82 @@ function renderMyAppointments() {
   `).join('');
 }
 
-function filterByOrderRange() {
-  const s = document.getElementById('orderDateStart');
-  const e = document.getElementById('orderDateEnd');
-  currentOrderStart = s ? s.value : '';
-  currentOrderEnd = e ? e.value : '';
-  renderMyAppointments();
+// ---- my-appointments date-range picker (same mobile UI as merchant-orders) ----
+function openApptDatePicker() {
+  apPickerStart = currentOrderStart; apPickerEnd = currentOrderEnd;
+  apPickerTarget = apPickerStart ? 'end' : 'start';
+  const base = apPickerStart || apPickerEnd || ymd(new Date());
+  const parts = base.split('-'); apPickerMonth = new Date(+parts[0], +parts[1] - 1, 1);
+  const p = document.getElementById('apptDatePicker'); if (p) p.classList.add('show');
+  renderApptDateGrid(); updateApptDateFields();
 }
-
-function resetOrderDate() {
-  currentOrderStart = '';
-  currentOrderEnd = '';
-  const s = document.getElementById('orderDateStart');
-  const e = document.getElementById('orderDateEnd');
-  if (s) s.value = '';
-  if (e) e.value = '';
-  renderMyAppointments();
+function closeApptDatePicker() {
+  const p = document.getElementById('apptDatePicker'); if (p) p.classList.remove('show');
+}
+function setApptDateTarget(which) {
+  apPickerTarget = which; updateApptDateFields();
+  const d = which === 'start' ? apPickerStart : apPickerEnd;
+  if (d) { const parts = d.split('-'); const nd = new Date(+parts[0], +parts[1] - 1, 1); if (nd.getFullYear() !== apPickerMonth.getFullYear() || nd.getMonth() !== apPickerMonth.getMonth()) { apPickerMonth = nd; renderApptDateGrid(); } }
+}
+function shiftApptMonth(delta) {
+  apPickerMonth = new Date(apPickerMonth.getFullYear(), apPickerMonth.getMonth() + delta, 1);
+  renderApptDateGrid();
+}
+function renderApptDateGrid() {
+  const grid = document.getElementById('apptDateGrid'); if (!grid) return;
+  const y = apPickerMonth.getFullYear(), mo = apPickerMonth.getMonth();
+  const first = new Date(y, mo, 1); const startW = first.getDay();
+  const daysInMonth = new Date(y, mo + 1, 0).getDate();
+  const prevDays = new Date(y, mo, 0).getDate();
+  const lbl = document.getElementById('apptDateMonthLabel'); if (lbl) lbl.textContent = y + '年' + (mo + 1) + '月';
+  const today = ymd(new Date());
+  let html = '';
+  for (let i = startW - 1; i >= 0; i--) html += `<div class="m-date-day muted">${prevDays - i}</div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = y + '-' + mDatePad(mo + 1) + '-' + mDatePad(d);
+    let cls = 'm-date-day';
+    if (ds === today) cls += ' today';
+    if (ds === apPickerStart || ds === apPickerEnd) cls += ' selected';
+    else if (apPickerStart && apPickerEnd && ds > apPickerStart && ds < apPickerEnd) cls += ' in-range';
+    html += `<div class="${cls}" data-d="${ds}" onclick="onApptDayTap('${ds}')">${d}</div>`;
+  }
+  const total = startW + daysInMonth; const trail = (7 - (total % 7)) % 7;
+  for (let d = 1; d <= trail; d++) html += `<div class="m-date-day muted">${d}</div>`;
+  grid.innerHTML = html;
+}
+function onApptDayTap(ds) {
+  if (apPickerTarget === 'start' || !apPickerStart) { apPickerStart = ds; apPickerEnd = ''; apPickerTarget = 'end'; }
+  else if (ds < apPickerStart) { apPickerStart = ds; }
+  else { apPickerEnd = ds; apPickerTarget = 'start'; }
+  renderApptDateGrid(); updateApptDateFields();
+}
+function updateApptDateFields() {
+  const sf = document.getElementById('apptDateStartField'), ef = document.getElementById('apptDateEndField');
+  const sv = document.getElementById('apptDateStartVal'), ev = document.getElementById('apptDateEndVal');
+  if (sv) sv.textContent = apPickerStart ? apPickerStart.slice(5) : '请选择';
+  if (ev) ev.textContent = apPickerEnd ? apPickerEnd.slice(5) : '请选择';
+  if (sf) sf.classList.toggle('active', apPickerTarget === 'start');
+  if (ef) ef.classList.toggle('active', apPickerTarget === 'end');
+}
+function confirmApptDateRange() {
+  currentOrderStart = apPickerStart; currentOrderEnd = apPickerEnd;
+  updateApptOrderTrigger(); closeApptDatePicker(); renderMyAppointments();
+}
+function resetApptOrderRange() {
+  currentOrderStart = ''; currentOrderEnd = '';
+  apPickerStart = ''; apPickerEnd = '';
+  updateApptOrderTrigger(); renderMyAppointments();
+}
+function resetApptDateRange() {
+  apPickerStart = ''; apPickerEnd = ''; apPickerTarget = 'start';
+  renderApptDateGrid(); updateApptDateFields();
+}
+function updateApptOrderTrigger() {
+  const t = document.getElementById('apptOrderTrigger'); if (!t) return;
+  if (currentOrderStart && currentOrderEnd) t.textContent = currentOrderStart.slice(5) + ' 至 ' + currentOrderEnd.slice(5);
+  else if (currentOrderStart) t.textContent = currentOrderStart.slice(5) + ' 起';
+  else if (currentOrderEnd) t.textContent = '至 ' + currentOrderEnd.slice(5);
+  else t.textContent = '全部日期';
 }
 
 function showToast(msg) {
@@ -1910,6 +1971,7 @@ document.addEventListener('DOMContentLoaded', () => {
     prefillAppointment();
   } else if (page === 'my-appointments') {
     renderMyAppointments();
+    updateApptOrderTrigger();
   } else if (page === 'map-picker') {
     setTimeout(() => initMapPicker(), 200);
   } else if (page === 'merchant') {

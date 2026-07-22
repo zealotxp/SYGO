@@ -5,11 +5,43 @@
 
     <div class="order-filter">
       <label>下单日期</label>
-      <input type="date" id="orderDateStart" onchange="filterByOrderRange()">
-      <span class="order-filter-sep">至</span>
-      <input type="date" id="orderDateEnd" onchange="filterByOrderRange()">
-      <button class="btn-reset" onclick="resetOrderDate()">全部</button>
+      <div class="order-date-trigger" id="apptOrderTrigger" onclick="openApptDatePicker()">全部日期</div>
+      <button class="btn-reset" onclick="resetApptOrderRange()">全部</button>
     </div>
 
     <div class="appointment-list" id="appointmentList" style="margin-top:12px;"></div>
+
+    <div class="m-date-picker" id="apptDatePicker">
+      <div class="m-date-mask" onclick="closeApptDatePicker()"></div>
+      <div class="m-date-sheet">
+        <div class="m-date-head">
+          <span class="m-date-title">选择下单日期</span>
+          <span class="m-date-close" onclick="closeApptDatePicker()">✕</span>
+        </div>
+        <div class="m-date-range">
+          <div class="m-date-field" id="apptDateStartField" onclick="setApptDateTarget('start')">
+            <span class="m-date-label">开始</span>
+            <span class="m-date-val" id="apptDateStartVal">请选择</span>
+          </div>
+          <span class="m-date-sep">至</span>
+          <div class="m-date-field" id="apptDateEndField" onclick="setApptDateTarget('end')">
+            <span class="m-date-label">结束</span>
+            <span class="m-date-val" id="apptDateEndVal">请选择</span>
+          </div>
+        </div>
+        <div class="m-date-cal-head">
+          <span class="m-date-nav" onclick="shiftApptMonth(-1)">‹</span>
+          <span id="apptDateMonthLabel"></span>
+          <span class="m-date-nav" onclick="shiftApptMonth(1)">›</span>
+        </div>
+        <div class="m-date-week">
+          <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+        </div>
+        <div class="m-date-grid" id="apptDateGrid"></div>
+        <div class="m-date-actions">
+          <button class="m-date-reset" onclick="resetApptDateRange()">重置</button>
+          <button class="m-date-confirm" onclick="confirmApptDateRange()">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
