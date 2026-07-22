@@ -1583,9 +1583,9 @@ function renderMerchantProducts() {
     const min = (PRODUCT_PRICE_MAP[d.id] || { min: 0 }).min;
     const suggested = (PRODUCT_PRICE_MAP[d.id] || { suggested: 0 }).suggested;
     const sel = merchantProductSelected.includes(d.id);
-    const priceInput = on
-      ? `<input class="m-prod-price-input" type="number" id="price-${d.id}" value="${price}" onchange="onMerchantPriceChange(${d.id})">`
-      : `<input class="m-prod-price-input muted" type="number" value="${suggested}" disabled>`;
+    const priceDisplay = on
+      ? `<span class="m-prod-plabel">售价</span><b class="m-prod-price-val">¥${price}</b>`
+      : `<span class="m-prod-plabel">建议价</span><b class="m-prod-price-val muted">¥${suggested}</b>`;
     return `
       <div class="m-prod-row ${on ? 'on' : ''}">
         <label class="m-prod-check"><input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleMerchantProductSelect(${d.id}, this.checked)"></label>
@@ -1593,7 +1593,7 @@ function renderMerchantProducts() {
         <div class="m-prod-body">
           <div class="m-prod-title">${escHtml(d.name)}</div>
           <div class="m-prod-meta"><span class="m-prod-fac">${escHtml(d.spec || '')}</span><span class="m-prod-dot">·</span><span class="m-prod-spec">${escHtml(d.spec2 || '')}</span></div>
-          <div class="m-prod-price-line"><span class="m-prod-plabel">售价</span>${priceInput}<span class="m-prod-limit">限¥${min}</span></div>
+          <div class="m-prod-price-line">${priceDisplay}<span class="m-prod-limit">限¥${min}</span><button class="m-prod-adjust" onclick="openMerchantPriceModal(${d.id})">调价</button></div>
         </div>
         <div class="m-prod-action"><button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button></div>
       </div>`;
@@ -1601,18 +1601,39 @@ function renderMerchantProducts() {
   updateMerchantBatchBar();
 }
 function toggleMerchantProduct(drugId) { const s = requireMerchant(); if (!s) return; merchantToggleOnsale(s.id, drugId); renderMerchantProducts(); }
-function onMerchantPriceChange(drugId) {
+let merchantPriceTarget = 0;
+function openMerchantPriceModal(drugId) {
   const s = requireMerchant(); if (!s) return;
-  const input = document.getElementById('price-' + drugId); if (!input) return;
-  const val = parseFloat(input.value); const min = (PRODUCT_PRICE_MAP[drugId] || { min: 0 }).min;
-  if (isNaN(val) || val < min) {
-    showToast('售价不能低于平台最低限价 ¥' + min);
-    const onsale = getOnsaleForMerchant(s.id); const item = onsale.find(x => x.drugId === drugId);
-    input.value = item ? item.storePrice : (PRODUCT_PRICE_MAP[drugId] || { suggested: 0 }).suggested;
-    return;
-  }
+  const d = drugsData.find(x => x.id === drugId); if (!d) return;
+  const onsale = getOnsaleForMerchant(s.id);
+  const item = onsale.find(x => x.drugId === drugId);
+  const on = !!item;
+  const min = (PRODUCT_PRICE_MAP[drugId] || { min: 0 }).min;
+  const cur = on ? item.storePrice : (PRODUCT_PRICE_MAP[drugId] || { suggested: 0 }).suggested;
+  merchantPriceTarget = drugId;
+  document.getElementById('mpmName').textContent = d.name + (on ? '' : '（未上架）');
+  document.getElementById('mpmCurrent').textContent = '¥' + cur;
+  document.getElementById('mpmMin').textContent = '¥' + min;
+  const input = document.getElementById('mpmInput');
+  input.value = cur; input.min = min;
+  const ok = document.getElementById('mpmOk');
+  const tip = document.getElementById('mpmTip');
+  if (on) { ok.disabled = false; tip.textContent = '售价不能低于平台最低限价'; tip.className = 'm-price-modal-tip'; }
+  else { ok.disabled = true; tip.textContent = '该商品尚未上架，请先上架后再调价'; tip.className = 'm-price-modal-tip warn'; }
+  document.getElementById('merchantPriceMask').classList.add('show');
+}
+function closeMerchantPriceModal() { document.getElementById('merchantPriceMask').classList.remove('show'); }
+function confirmMerchantPrice() {
+  const s = requireMerchant(); if (!s) return;
+  const drugId = merchantPriceTarget; if (!drugId) return;
+  if (!getOnsaleForMerchant(s.id).find(x => x.drugId === drugId)) { showToast('请先上架该商品后再调价'); return; }
+  const min = (PRODUCT_PRICE_MAP[drugId] || { min: 0 }).min;
+  const val = parseFloat(document.getElementById('mpmInput').value);
+  if (isNaN(val) || val < min) { showToast('售价不能低于平台最低限价 ¥' + min); return; }
   const r = setMerchantProductPrice(s.id, drugId, val);
   if (!r.ok) showToast(r.msg); else showToast('价格已保存');
+  closeMerchantPriceModal();
+  renderMerchantProducts();
 }
 function toggleMerchantProductSelect(drugId, checked) {
   if (checked) { if (!merchantProductSelected.includes(drugId)) merchantProductSelected.push(drugId); }

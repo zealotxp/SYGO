@@ -32,6 +32,21 @@
         <button class="btn-batch off" onclick="merchantBatchOff()">批量下架</button>
       </div>
     </div>
+
+    <div class="m-price-modal-mask" id="merchantPriceMask" onclick="if(event.target===this)closeMerchantPriceModal()">
+      <div class="m-price-modal">
+        <div class="m-price-modal-title">调整售价</div>
+        <div class="m-price-modal-name" id="mpmName"></div>
+        <div class="m-price-modal-row"><span>当前售价</span><b id="mpmCurrent"></b></div>
+        <div class="m-price-modal-row"><span>平台最低限价</span><b class="m-price-limit" id="mpmMin"></b></div>
+        <input class="m-price-modal-input" id="mpmInput" type="number" placeholder="请输入新售价">
+        <div class="m-price-modal-tip" id="mpmTip"></div>
+        <div class="m-price-modal-btns">
+          <button class="m-price-btn cancel" onclick="closeMerchantPriceModal()">取消</button>
+          <button class="m-price-btn ok" id="mpmOk" onclick="confirmMerchantPrice()">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
 
 
