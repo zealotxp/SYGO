@@ -1593,9 +1593,12 @@ function renderMerchantProducts() {
         <div class="m-prod-body">
           <div class="m-prod-title">${escHtml(d.name)}</div>
           <div class="m-prod-meta"><span class="m-prod-fac">${escHtml(d.spec || '')}</span><span class="m-prod-dot">·</span><span class="m-prod-spec">${escHtml(d.spec2 || '')}</span></div>
-          <div class="m-prod-price-line">${priceDisplay}<span class="m-prod-limit">限¥${min}</span><button class="m-prod-adjust" onclick="openMerchantPriceModal(${d.id})">调价</button></div>
+          <div class="m-prod-price-line">${priceDisplay}<span class="m-prod-limit">限¥${min}</span></div>
         </div>
-        <div class="m-prod-action"><button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button></div>
+        <div class="m-prod-action">
+          <button class="m-prod-adjust" onclick="openMerchantPriceModal(${d.id})">调价</button>
+          <button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button>
+        </div>
       </div>`;
   }).join('');
   updateMerchantBatchBar();

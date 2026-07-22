@@ -1950,11 +1950,11 @@
   .m-prod-plabel { font-size: 11px; color: var(--text-secondary); flex: none; }
   .m-prod-price-val { font-size: 13px; color: var(--primary); font-weight: 600; }
   .m-prod-price-val.muted { color: var(--text-light); font-weight: 500; }
-  .m-prod-adjust { margin-left: auto; padding: 3px 12px; border-radius: 12px; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; cursor: pointer; white-space: nowrap; flex: none; }
+  .m-prod-adjust { width: 100%; padding: 5px 0; border-radius: 14px; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; cursor: pointer; white-space: nowrap; text-align: center; box-sizing: border-box; }
   .m-prod-adjust:active { background: var(--primary-light); }
   .m-prod-limit { font-size: 11px; color: var(--red); flex: none; }
-  .m-prod-action { flex: none; display: flex; align-items: center; }
-  .m-prod-toggle { padding: 5px 12px; border-radius: 14px; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .m-prod-action { flex: none; width: 58px; display: flex; flex-direction: column; gap: 6px; }
+  .m-prod-toggle { width: 100%; padding: 5px 0; border-radius: 14px; border: 1px solid var(--primary); background: #fff; color: var(--primary); font-size: 12px; cursor: pointer; white-space: nowrap; text-align: center; box-sizing: border-box; }
   .m-prod-toggle.on { background: var(--primary); color: #fff; }
   .merchant-batch-bar { position: fixed; left: 0; right: 0; bottom: 0; display: none; align-items: center; justify-content: space-between; padding: 10px 16px; background: #fff; box-shadow: 0 -2px 8px rgba(0,0,0,0.08); z-index: 200; }
   .merchant-batch-bar > span { font-size: 13px; color: var(--text-secondary); }
