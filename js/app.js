@@ -1583,17 +1583,17 @@ function renderMerchantProducts() {
     const min = (PRODUCT_PRICE_MAP[d.id] || { min: 0 }).min;
     const suggested = (PRODUCT_PRICE_MAP[d.id] || { suggested: 0 }).suggested;
     const sel = merchantProductSelected.includes(d.id);
-    const priceHtml = (PLATFORM_SETTINGS.priceVisible && on)
-      ? `<div class="m-prod-price"><span>售价</span><input class="m-prod-price-input" type="number" id="price-${d.id}" value="${price}" onchange="onMerchantPriceChange(${d.id})"><span class="m-prod-min">限¥${min}</span></div>`
-      : '';
+    const priceInput = on
+      ? `<input class="m-prod-price-input" type="number" id="price-${d.id}" value="${price}" onchange="onMerchantPriceChange(${d.id})">`
+      : `<input class="m-prod-price-input muted" type="number" value="${suggested}" disabled>`;
     return `
-      <div class="m-prod-item ${on ? 'on' : ''}">
+      <div class="m-prod-row ${on ? 'on' : ''}">
         <label class="m-prod-check"><input type="checkbox" ${sel ? 'checked' : ''} onchange="toggleMerchantProductSelect(${d.id}, this.checked)"></label>
-        <div class="m-prod-icon">${d.emoji || '💊'}</div>
-        <div class="m-prod-info">
-          <div class="m-prod-name">${escHtml(d.name)}</div>
-          <div class="m-prod-sub"><span class="m-prod-spec">${escHtml(d.spec || '')} · ${escHtml(d.spec2 || '')}</span><span class="m-prod-cat">${MERCHANT_CATEGORY_LABELS[d.category] || d.category}</span></div>
-          ${priceHtml}
+        <div class="m-prod-thumb"><span style="background:${escHtml(d.emojiBg || '#E8F0FE')}">${escHtml(d.emoji || '💊')}</span></div>
+        <div class="m-prod-body">
+          <div class="m-prod-title">${escHtml(d.name)}</div>
+          <div class="m-prod-meta"><span class="m-prod-fac">${escHtml(d.spec || '')}</span><span class="m-prod-dot">·</span><span class="m-prod-spec">${escHtml(d.spec2 || '')}</span></div>
+          <div class="m-prod-price-line"><span class="m-prod-plabel">售价</span>${priceInput}<span class="m-prod-limit">限¥${min}</span></div>
         </div>
         <div class="m-prod-action"><button class="m-prod-toggle ${on ? 'on' : ''}" onclick="toggleMerchantProduct(${d.id})">${on ? '下架' : '上架'}</button></div>
       </div>`;
