@@ -3,27 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>我的预约 - 上药GO</title>
+<title>学术园地 - 上药GO</title>
 <link rel="stylesheet" href="css/common.css">
 
 </head>
-<body data-page="my-appointments">
+<body data-page="academic">
 <div class="app-container" id="app">
 <div class="toast" id="toast"></div>
-<div class="page active" id="myAppointmentsPage">
+<div class="page active" id="academicPage">
     <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
-      我的预约
+      学术园地
     </div>
 
-    <div class="order-filter">
-      <label>下单日期</label>
-      <input type="date" id="orderDateStart" onchange="filterByOrderRange()">
-      <span class="order-filter-sep">至</span>
-      <input type="date" id="orderDateEnd" onchange="filterByOrderRange()">
-      <button class="btn-reset" onclick="resetOrderDate()">全部</button>
+    <div class="academic-top">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="academicSearchInput" placeholder="搜索文章标题或摘要" onkeydown="if(event.key==='Enter')goAcademicSearch()">
+        <span class="academic-search-go" onclick="goAcademicSearch()">搜索</span>
+      </div>
+      <div class="academic-cat-bar">
+        <div class="academic-cat-chip" id="academicCatChip" onclick="openAcademicCategoryPicker()">全部分类</div>
+      </div>
     </div>
 
-    <div class="appointment-list" id="appointmentList" style="margin-top:12px;"></div>
+    <div class="academic-list" id="academicList"></div>
+
+    <div class="modal-overlay" id="academicCatSheet" onclick="if(event.target===this)closeAcademicCategoryPicker()">
+      <div class="ac-cat-sheet">
+        <div class="ac-cat-sheet-head">
+          <span>选择文章分类</span>
+          <span class="ac-cat-sheet-all" onclick="resetAcademicCategory()">全部分类</span>
+        </div>
+        <div class="ac-cat-cols">
+          <div class="ac-cat-col" id="acCatCol1"></div>
+          <div class="ac-cat-col" id="acCatCol2"></div>
+          <div class="ac-cat-col" id="acCatCol3"></div>
+        </div>
+        <div class="ac-cat-sheet-foot">
+          <button class="btn-primary" onclick="confirmAcademicCategory()">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="tab-bar" id="tabBar">
@@ -31,7 +51,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>首页</span>
     </div>
-    <div class="tab-item" onclick="switchTab('academic')">
+    <div class="tab-item active" onclick="switchTab('academic')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>学术</span>
     </div>

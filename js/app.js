@@ -512,7 +512,7 @@ const PAGE_FILE = {
 };
 function getParam(name){ const p = new URLSearchParams(location.search); return p.get(name); }
 function showPage(pageId){ const f = PAGE_FILE[pageId]; if (f) location.href = f; }
-function switchTab(tab){ const map={home:'index.html',search:'search.html',myAppointments:'my-appointments.html',profile:'profile.html'}; location.href = map[tab] || 'index.html'; }
+function switchTab(tab){ const map={home:'index.html',search:'search.html',academic:'academic.html',myAppointments:'my-appointments.html',profile:'profile.html'}; location.href = map[tab] || 'index.html'; }
 function goHome(){ location.href = 'index.html'; }
 function goBack(){ if (history.length > 1) history.back(); else location.href = 'index.html'; }
 
@@ -1679,6 +1679,221 @@ function doChangeMerchantPassword() {
   setTimeout(() => { location.href = 'merchant.html'; }, 1000);
 }
 
+// ===================== 学术园地 (Academic Garden) =====================
+const ARTICLE_CATEGORIES = [
+  { id:'c1', name:'临床医学', children:[
+    { id:'c1-1', name:'血液科', children:[
+      { id:'c1-1-1', name:'免疫球蛋白应用' },
+      { id:'c1-1-2', name:'白蛋白应用' },
+    ]},
+    { id:'c1-2', name:'药学服务', children:[
+      { id:'c1-2-1', name:'合理用药' },
+      { id:'c1-2-2', name:'药物治疗管理' },
+    ]},
+  ]},
+  { id:'c2', name:'药学进展', children:[
+    { id:'c2-1', name:'生物制剂', children:[
+      { id:'c2-1-1', name:'单抗类药物' },
+      { id:'c2-1-2', name:'重组蛋白' },
+    ]},
+    { id:'c2-2', name:'临床药理', children:[
+      { id:'c2-2-1', name:'药代动力学' },
+      { id:'c2-2-2', name:'药物基因组学' },
+    ]},
+  ]},
+  { id:'c3', name:'政策规范', children:[
+    { id:'c3-1', name:'行业规范', children:[
+      { id:'c3-1-1', name:'GSP规范' },
+      { id:'c3-1-2', name:'处方管理' },
+    ]},
+    { id:'c3-2', name:'医保政策', children:[
+      { id:'c3-2-1', name:'医保目录' },
+      { id:'c3-2-2', name:'带量采购' },
+    ]},
+  ]},
+];
+
+const ARTICLES = [
+  { id:'a1', title:'静注人免疫球蛋白在原发性免疫缺陷病中的应用专家共识', author:'中国药师协会', date:'2026-06-18', cat:'c1-1-1', emoji:'🩸', bg:'#FDEBEC', summary:'本文系统阐述了静注人免疫球蛋白(IVIG)在原发性免疫缺陷病(PID)中的适应证、给药方案与安全性管理，为临床合理用药提供循证依据。', attachments:[{name:'IVIG专家共识.pdf', file:'articles/a1.pdf'}] },
+  { id:'a2', title:'人血白蛋白在肝硬化腹水治疗中的循证评价', author:'中华医学会肝病学分会', date:'2026-06-10', cat:'c1-1-2', emoji:'💉', bg:'#E8F0FE', summary:'综述人血白蛋白用于肝硬化腹水、自发性细菌性腹膜炎及肝肾综合征的循证证据，明确推荐剂量与疗程。', attachments:[{name:'人血白蛋白循证评价.pdf', file:'articles/a2.pdf'}] },
+  { id:'a3', title:'慢病患者多重用药的风险识别与药物治疗管理', author:'王立明 主任药师', date:'2026-05-28', cat:'c1-2-1', emoji:'💊', bg:'#E6F7EE', summary:'针对老年慢病患者多重用药现状，提出用药风险筛查工具与药师主导的药物治疗管理(MTM)路径。', attachments:[{name:'多重用药管理.pdf', file:'articles/a3.pdf'}] },
+  { id:'a4', title:'抗菌药物合理使用与耐药防控实践指南', author:'医院感染管理专业委员会', date:'2026-05-15', cat:'c1-2-2', emoji:'🧪', bg:'#FFF4E5', summary:'围绕抗菌药物分级管理、围手术期预防用药及耐药菌防控，给出基层医疗机构落地操作建议。', attachments:[{name:'抗菌药物合理使用.pdf', file:'articles/a4.pdf'}] },
+  { id:'a5', title:'PD-1/PD-L1 单抗类药物的作用机制与临床研究进展', author:'肿瘤药学协作组', date:'2026-06-02', cat:'c2-1-1', emoji:'🧬', bg:'#F3E8FF', summary:'梳理免疫检查点抑制剂的作用机制、获批适应证及真实世界安全性数据，展望联合治疗方向。', attachments:[{name:'单抗类药物进展.pdf', file:'articles/a5.pdf'}] },
+  { id:'a6', title:'重组人凝血因子Ⅷ在血友病A治疗中的应用', author:'血液病药学组', date:'2026-04-22', cat:'c2-1-2', emoji:'🔬', bg:'#E0F2FE', summary:'比较重组与血浆源凝血因子Ⅷ的药效与免疫原性，规范按需与预防替代治疗策略。', attachments:[{name:'凝血因子VIII应用.pdf', file:'articles/a6.pdf'}] },
+  { id:'a7', title:'慢性肾病患者药代动力学特征与剂量调整', author:'临床药理学杂志', date:'2026-05-05', cat:'c2-2-1', emoji:'📈', bg:'#FEF3F2', summary:'阐述肾功能减退对药物清除的影响，建立基于估算肾小球滤过率的剂量调整框架与监护要点。', attachments:[{name:'CKD剂量调整.pdf', file:'articles/a7.pdf'}] },
+  { id:'a8', title:'药物基因组学指导华法林个体化用药专家意见', author:'精准药学联盟', date:'2026-04-12', cat:'c2-2-2', emoji:'🧾', bg:'#ECFDF5', summary:'基于CYP2C9与VKORC1基因型制定华法林初始剂量算法，降低出血与血栓风险。', attachments:[{name:'华法林个体化用药.pdf', file:'articles/a8.pdf'}] },
+  { id:'a9', title:'药品经营质量管理规范(GSP)现场检查要点解读', author:'药品监管科学研究会', date:'2026-03-30', cat:'c3-1-1', emoji:'📋', bg:'#F0F9FF', summary:'逐条解读药品经营质量管理规范对冷链、储存与追溯的要求，梳理零售药店合规自查清单。', attachments:[{name:'GSP检查要点.pdf', file:'articles/a9.pdf'}] },
+  { id:'a10', title:'处方审核管理办法与常见不合理处方分析', author:'药事管理专业委员会', date:'2026-03-18', cat:'c3-1-2', emoji:'📝', bg:'#FFF7ED', summary:'结合处方审核规范，归纳配伍禁忌、超剂量等典型问题处方并给出干预模板。', attachments:[{name:'处方审核分析.pdf', file:'articles/a10.pdf'}] },
+  { id:'a11', title:'新版国家医保药品目录调整趋势分析', author:'医保政策研究中心', date:'2026-02-25', cat:'c3-2-1', emoji:'🏥', bg:'#F5F3FF', summary:'分析近年医保目录谈判准入特征，解读创新药补短板惠民生的遴选逻辑。', attachments:[{name:'医保目录调整.pdf', file:'articles/a11.pdf'}] },
+  { id:'a12', title:'药品集中带量采购对临床用药结构的影响', author:'卫生经济与政策组', date:'2026-02-10', cat:'c3-2-2', emoji:'📊', bg:'#ECFEFF', summary:'基于带量采购落地数据，评估中选药品替代、费用节约与供应保障情况。', attachments:[{name:'带量采购影响.pdf', file:'articles/a12.pdf'}] },
+];
+
+function escapeHTML(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function academicCatName(catId){
+  for(const l1 of ARTICLE_CATEGORIES) for(const l2 of (l1.children||[])) for(const l3 of (l2.children||[])) if(l3.id===catId) return l3.name;
+  return '';
+}
+function academicCatPathNames(id){
+  for(const l1 of ARTICLE_CATEGORIES){
+    if(l1.id===id) return [l1.name];
+    for(const l2 of (l1.children||[])){
+      if(l2.id===id) return [l1.name,l2.name];
+      for(const l3 of (l2.children||[])) if(l3.id===id) return [l1.name,l2.name,l3.name];
+    }
+  }
+  return [];
+}
+function academicCardHTML(a){
+  return `<div class="academic-card" onclick="goAcademicDetail('${a.id}')">
+    <div class="academic-cover" style="background:${a.bg}">${a.emoji}</div>
+    <div class="academic-card-body">
+      <div class="academic-card-title">${a.title}</div>
+      <div class="academic-card-meta">
+        <span class="academic-card-date">${a.date}</span>
+        <span class="academic-card-cat">${academicCatName(a.cat)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- Article list (academic.html) ----
+let academicCat = null;
+function renderAcademicList(){
+  const list = document.getElementById('academicList');
+  if(!list) return;
+  const data = (!academicCat) ? ARTICLES : ARTICLES.filter(a => a.cat.indexOf(academicCat) === 0);
+  list.innerHTML = data.length ? data.map(academicCardHTML).join('') : '<div class="academic-empty">该分类下暂无文章</div>';
+  updateAcademicCatChip();
+}
+function updateAcademicCatChip(){
+  const chip = document.getElementById('academicCatChip');
+  if(!chip) return;
+  chip.textContent = academicCat ? academicCatPathNames(academicCat).join(' / ') : '全部分类';
+}
+function goAcademicSearch(q){
+  const s = (q != null ? q : (document.getElementById('academicSearchInput')?.value || '')).trim();
+  location.href = 'academic-search.html?q=' + encodeURIComponent(s);
+}
+
+// ---- 3-level category cascade picker ----
+let acSel = [null,null,null];
+function academicCatToPath(id){
+  if(!id) return [null,null,null];
+  for(const l1 of ARTICLE_CATEGORIES){
+    if(l1.id===id) return [l1.id,null,null];
+    for(const l2 of (l1.children||[])){
+      if(l2.id===id) return [l1.id,l2.id,null];
+      for(const l3 of (l2.children||[])) if(l3.id===id) return [l1.id,l2.id,l3.id];
+    }
+  }
+  return [null,null,null];
+}
+function openAcademicCategoryPicker(){
+  acSel = academicCatToPath(academicCat);
+  renderAcademicCatColumns();
+  document.getElementById('academicCatSheet')?.classList.add('show');
+}
+function closeAcademicCategoryPicker(){ document.getElementById('academicCatSheet')?.classList.remove('show'); }
+function renderAcademicCatColumns(){
+  const c1 = document.getElementById('acCatCol1');
+  const c2 = document.getElementById('acCatCol2');
+  const c3 = document.getElementById('acCatCol3');
+  if(c1) c1.innerHTML = ARTICLE_CATEGORIES.map(n=>`<div class="ac-cat-row${acSel[0]===n.id?' active':''}" onclick="acPick(1,'${n.id}')">${n.name}</div>`).join('');
+  const l1 = ARTICLE_CATEGORIES.find(n=>n.id===acSel[0]);
+  if(c2) c2.innerHTML = (l1&&l1.children) ? l1.children.map(n=>`<div class="ac-cat-row${acSel[1]===n.id?' active':''}" onclick="acPick(2,'${n.id}')">${n.name}</div>`).join('') : '';
+  const l2 = (l1&&l1.children) ? l1.children.find(n=>n.id===acSel[1]) : null;
+  if(c3) c3.innerHTML = (l2&&l2.children) ? l2.children.map(n=>`<div class="ac-cat-row${acSel[2]===n.id?' active':''}" onclick="acPick(3,'${n.id}')">${n.name}</div>`).join('') : '';
+}
+function acPick(level,id){
+  if(level===1){ acSel[0]=id; acSel[1]=null; acSel[2]=null; }
+  else if(level===2){ acSel[1]=id; acSel[2]=null; }
+  else { acSel[2]=id; }
+  renderAcademicCatColumns();
+}
+function confirmAcademicCategory(){
+  academicCat = acSel[2] || acSel[1] || acSel[0] || null;
+  closeAcademicCategoryPicker();
+  renderAcademicList();
+}
+function resetAcademicCategory(){
+  academicCat = null;
+  closeAcademicCategoryPicker();
+  renderAcademicList();
+}
+
+// ---- Article search results (academic-search.html) ----
+function renderAcademicSearch(){
+  const el = document.getElementById('academicSearchList');
+  if(!el) return;
+  const q = (getParam('q')||'').trim();
+  const hint = document.getElementById('academicSearchHint');
+  if(hint) hint.textContent = q ? ('搜索：“' + q + '”') : '全部文章';
+  const inputEl = document.getElementById('academicSearchInput');
+  if(inputEl) inputEl.value = q;
+  const kw = q.toLowerCase();
+  const data = ARTICLES.filter(a => a.title.toLowerCase().includes(kw) || a.summary.toLowerCase().includes(kw));
+  if(!data.length){
+    el.innerHTML = `<div class="academic-empty-box">
+      <div class="academic-empty-icon">🔍</div>
+      <div class="academic-empty-title">未找到相关文章</div>
+      <div class="academic-empty-sub">没有与“${escapeHTML(q)}”匹配的结果</div>
+      <button class="btn-primary" onclick="location.href='academic.html'">返回文章列表</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div class="academic-search-count">找到 ${data.length} 篇相关文章</div>` + data.map(academicCardHTML).join('');
+}
+
+// ---- Article detail (academic-detail.html) ----
+function goAcademicDetail(id){ location.href = 'academic-detail.html?id=' + encodeURIComponent(id); }
+function renderAcademicDetail(){
+  const el = document.getElementById('academicDetail');
+  if(!el) return;
+  const a = ARTICLES.find(x=>x.id === getParam('id')) || ARTICLES[0];
+  if(!a){ el.innerHTML = '<div class="academic-empty">文章不存在</div>'; return; }
+  const attachHTML = (a.attachments||[]).map(at=>`
+    <div class="ac-attach">
+      <div class="ac-attach-icon">📄</div>
+      <div class="ac-attach-info">
+        <div class="ac-attach-name">${at.name}</div>
+        <div class="ac-attach-type">PDF 附件</div>
+      </div>
+      <div class="ac-attach-actions">
+        <button class="ac-btn-preview" onclick="openArticlePreview('${at.file}','${escapeHTML(at.name)}')">预览</button>
+        <a class="ac-btn-download" href="${at.file}" download="${escapeHTML(at.name)}">下载</a>
+      </div>
+    </div>`).join('');
+  el.innerHTML = `
+    <h1 class="ac-detail-title">${a.title}</h1>
+    <div class="ac-detail-meta">
+      <span>${a.author}</span><span class="ac-dot">·</span><span>${a.date}</span>
+      <span class="ac-detail-cat">${academicCatName(a.cat)}</span>
+    </div>
+    <div class="ac-detail-summary">
+      <div class="ac-detail-summary-label">摘要</div>
+      <div class="ac-detail-summary-text">${a.summary}</div>
+    </div>
+    <div class="ac-detail-attach-title">文章附件（PDF）</div>
+    <div class="ac-attach-list">${attachHTML || '<div class="academic-empty">暂无附件</div>'}</div>
+  `;
+}
+function openArticlePreview(file, name){
+  const m = document.getElementById('articlePreviewModal');
+  const frame = document.getElementById('articlePreviewFrame');
+  if(frame) frame.src = file;
+  const dn = document.getElementById('articlePreviewDownload');
+  if(dn){ dn.href = file; try{ dn.download = name || ''; }catch(e){} }
+  const nm = document.getElementById('articlePreviewName');
+  if(nm) nm.textContent = name || '';
+  if(m) m.classList.add('show');
+}
+function closeArticlePreview(){
+  const m = document.getElementById('articlePreviewModal');
+  const frame = document.getElementById('articlePreviewFrame');
+  if(frame) frame.src = 'about:blank';
+  if(m) m.classList.remove('show');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'home') {
@@ -1708,5 +1923,11 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMerchantProducts();
   } else if (page === 'merchant-store') {
     renderMerchantStore();
+  } else if (page === 'academic') {
+    renderAcademicList();
+  } else if (page === 'academic-detail') {
+    renderAcademicDetail();
+  } else if (page === 'academic-search') {
+    renderAcademicSearch();
   }
 });

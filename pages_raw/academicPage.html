@@ -1,0 +1,36 @@
+<div class="page" id="academicPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      学术园地
+    </div>
+
+    <div class="academic-top">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="academicSearchInput" placeholder="搜索文章标题或摘要" onkeydown="if(event.key==='Enter')goAcademicSearch()">
+        <span class="academic-search-go" onclick="goAcademicSearch()">搜索</span>
+      </div>
+      <div class="academic-cat-bar">
+        <div class="academic-cat-chip" id="academicCatChip" onclick="openAcademicCategoryPicker()">全部分类</div>
+      </div>
+    </div>
+
+    <div class="academic-list" id="academicList"></div>
+
+    <!-- ===== 3-level category bottom sheet ===== -->
+    <div class="modal-overlay" id="academicCatSheet" onclick="if(event.target===this)closeAcademicCategoryPicker()">
+      <div class="ac-cat-sheet">
+        <div class="ac-cat-sheet-head">
+          <span>选择文章分类</span>
+          <span class="ac-cat-sheet-all" onclick="resetAcademicCategory()">全部分类</span>
+        </div>
+        <div class="ac-cat-cols">
+          <div class="ac-cat-col" id="acCatCol1"></div>
+          <div class="ac-cat-col" id="acCatCol2"></div>
+          <div class="ac-cat-col" id="acCatCol3"></div>
+        </div>
+        <div class="ac-cat-sheet-foot">
+          <button class="btn-primary" onclick="confirmAcademicCategory()">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>

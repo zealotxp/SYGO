@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>文章详情 - 上药GO</title>
+<link rel="stylesheet" href="css/common.css">
+
+</head>
+<body data-page="academic-detail">
+<div class="app-container" id="app">
+<div class="toast" id="toast"></div>
+<div class="page active" id="academicDetailPage">
+    <div class="nav-bar" style="background:var(--white);color:var(--text);position:sticky;top:0;z-index:100;">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      文章详情
+    </div>
+
+    <div class="academic-detail" id="academicDetail"></div>
+
+    <div class="bottom-action-bar">
+      <button class="btn-primary" onclick="location.href='academic.html'">返回文章列表</button>
+    </div>
+
+    <div class="modal-overlay" id="articlePreviewModal" onclick="if(event.target===this)closeArticlePreview()">
+      <div class="article-preview-modal">
+        <div class="article-preview-head">
+          <span id="articlePreviewName">附件预览</span>
+          <span class="article-preview-close" onclick="closeArticlePreview()">✕</span>
+        </div>
+        <iframe id="articlePreviewFrame" class="article-preview-frame" src="about:blank"></iframe>
+        <div class="article-preview-foot">
+          <a class="btn-primary" id="articlePreviewDownload" href="#" download="">下载到本地</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
