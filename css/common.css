@@ -39,6 +39,43 @@
   }
 
   /* ===== Status Bar ===== */
+  .status-bar {
+    height: 44px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    padding: 0 16px;
+  }
+
+  /* ===== Nav Bar ===== */
+  .nav-bar {
+    height: 48px;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    position: relative;
+    padding: 0 16px;
+  }
+  .nav-bar .back-btn {
+    position: absolute;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+  .nav-bar .back-btn:hover { background: rgba(255,255,255,0.15); }
   .nav-bar .back-btn svg { width: 20px; height: 20px; }
 
   /* ===== Tab Bar ===== */
@@ -124,6 +161,7 @@
   }
   .location-bar svg { width: 14px; height: 14px; }
   .location-bar .loc-text { flex: 1; }
+  .location-bar .change-loc { opacity: 0.8; text-decoration: underline; }
   .location-bar .loc-actions { display: flex; gap: 6px; }
   .location-bar .loc-btn {
     background: rgba(255,255,255,0.22);
@@ -988,11 +1026,15 @@
     border-radius: 10px;
     font-weight: 500;
   }
+  .status-pending { background: var(--orange-light); color: var(--orange); }
+  .status-arrived { background: var(--primary-light); color: var(--primary); }
+  .status-cancelled { background: #F5F5F5; color: #999; }
   .status-success { background: #E8F8EE; color: #18A058; }
   .appointment-item-qty { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
   .empty-tip { text-align: center; color: var(--text-secondary); padding: 48px 0; font-size: 14px; }
   .order-filter { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--white); border-bottom: 1px solid var(--border); }
   .order-filter label { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+  .order-filter-sep { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
   .order-filter input[type="date"] { flex: 1; min-width: 0; height: 34px; padding: 0 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--text); }
   .order-filter .btn-reset { height: 34px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--primary); font-size: 13px; cursor: pointer; white-space: nowrap; }
   .order-filter .btn-reset:active { background: var(--primary-light); }
@@ -1054,6 +1096,60 @@
   .appointment-item-drug { font-size: 15px; font-weight: 600; }
   .appointment-item-merchant { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
   .appointment-item-time { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .appointment-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: flex-end;
+  }
+  .btn-sm {
+    height: 30px;
+    padding: 0 16px;
+    border-radius: 15px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-sm-cancel {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .btn-sm-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* ===== Personal Center ===== */
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary), #5CD89D);
+    padding: 30px 20px 40px;
+    color: white;
+  }
+  .profile-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    border: 3px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+  }
+  .profile-name {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .profile-id { font-size: 12px; opacity: 0.8; margin-top: 4px; }
 
   .profile-menu {
     margin: -20px 16px 10px;
@@ -1395,6 +1491,12 @@
   .about-item-value { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
 
   /* ===== Empty State ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .empty-state-icon { font-size: 60px; margin-bottom: 16px; }
+  .empty-state-text { font-size: 14px; color: var(--text-secondary); }
 
   /* ===== Login Page ===== */
   .login-page {
@@ -1470,6 +1572,80 @@
   .login-privacy a { color: var(--primary); text-decoration: none; }
 
   /* ===== Tabs for sub-page filtering ===== */
+  .filter-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 16px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+  }
+  .filter-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .filter-tab.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .filter-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  /* ===== Filter Chips ===== */
+  .filter-chip {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  .filter-chip.active {
+    color: var(--primary);
+    background: var(--primary-light);
+    border-color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* ===== Sort Items ===== */
+  .sort-item {
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .sort-item.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* ===== All Drugs List ===== */
+  .all-drug-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .all-drug-item:last-child { border-bottom: none; }
   .all-drug-img {
     width: 80px;
     height: 80px;
@@ -1651,6 +1827,7 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
+  .fade-in { animation: fadeIn 0.3s ease; }
 
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -1826,6 +2003,7 @@
   .store-cert-list { display: flex; gap: 10px; flex-wrap: wrap; }
   .store-cert-thumb { width: 100px; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
 
+
 /* ===================== 学术园地 Academic Garden ===================== */
 .academic-top { padding: 10px 16px 12px; background: var(--white); }
 .academic-top .search-input-wrap { background: var(--bg); }
@@ -1899,6 +2077,7 @@
 .article-preview-frame { flex: 1; width: 100%; border: none; background: #525659; }
 .article-preview-foot { padding: 12px 16px; border-top: 1px solid #f0f0f0; }
 .article-preview-foot .btn-primary { display: block; width: 100%; text-align: center; }
+
 
 /* ===================== AI 医疗智能体 AI Page ===================== */
 #aiPage { padding-top: 0; padding-bottom: 0; background: var(--white); }
