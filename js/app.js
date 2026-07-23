@@ -707,7 +707,7 @@ function renderDrugDetail(id) {
 }
 
 // 购药流程副标题（mock 文本，后续接真实接口替换）
-const DRUG_DETAIL_SUBTITLE = '购药流程：交订单 — 登记信息 — 联系商家 — 预约取药';
+const DRUG_DETAIL_SUBTITLE = '服务流程：提交预约单—联系商家—预约取药';
 function renderDrugDetailFlow() {
   const el = document.getElementById('drugDetailSub');
   if (el) el.textContent = DRUG_DETAIL_SUBTITLE;
