@@ -706,17 +706,11 @@ function renderDrugDetail(id) {
   renderDrugDetailFlow();
 }
 
-// 购药流程（mock 数据，后续接真实接口替换）
-const DRUG_DETAIL_FLOW = ['交订单', '登记信息', '联系商家', '预约取药'];
+// 购药流程副标题（mock 文本，后续接真实接口替换）
+const DRUG_DETAIL_SUBTITLE = '购药流程：交订单 — 登记信息 — 联系商家 — 预约取药';
 function renderDrugDetailFlow() {
-  const el = document.getElementById('drugFlowSteps');
-  if (!el) return;
-  el.innerHTML = DRUG_DETAIL_FLOW.map((name, i) =>
-    '<div class="drug-flow-step">'
-    + '<div class="drug-flow-dot">' + (i + 1) + '</div>'
-    + '<div class="drug-flow-name">' + name + '</div>'
-    + '</div>'
-  ).join('');
+  const el = document.getElementById('drugDetailSub');
+  if (el) el.textContent = DRUG_DETAIL_SUBTITLE;
 }
 
 function goMerchantDetail(id) { location.href = 'merchant-detail.html?id=' + id; }
