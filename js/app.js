@@ -702,6 +702,21 @@ function renderDrugDetail(id) {
     html += '<div class="loading-more">— 已显示全部商家 —</div>';
     nearbySection.innerHTML = html;
   }
+
+  renderDrugDetailFlow();
+}
+
+// 购药流程（mock 数据，后续接真实接口替换）
+const DRUG_DETAIL_FLOW = ['交订单', '登记信息', '联系商家', '预约取药'];
+function renderDrugDetailFlow() {
+  const el = document.getElementById('drugFlowSteps');
+  if (!el) return;
+  el.innerHTML = DRUG_DETAIL_FLOW.map((name, i) =>
+    '<div class="drug-flow-step">'
+    + '<div class="drug-flow-dot">' + (i + 1) + '</div>'
+    + '<div class="drug-flow-name">' + name + '</div>'
+    + '</div>'
+  ).join('');
 }
 
 function goMerchantDetail(id) { location.href = 'merchant-detail.html?id=' + id; }
