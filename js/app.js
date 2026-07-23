@@ -504,14 +504,7 @@ function refreshLocation() {
 }
 
 // ===== Navigation (MPA: 真实多页跳转) =====
-const PAGE_FILE = {
-  home:'index.html', search:'search.html', allDrugs:'all-drugs.html', allMerchants:'all-merchants.html',
-  drugDetail:'drug-detail.html', merchantDetail:'merchant-detail.html', appointment:'appointment.html',
-  myAppointments:'my-appointments.html', profile:'profile.html', about:'about.html',
-  privacy:'privacy.html', agreement:'agreement.html', mapPicker:'map-picker.html', login:'login.html'
-};
 function getParam(name){ const p = new URLSearchParams(location.search); return p.get(name); }
-function showPage(pageId){ const f = PAGE_FILE[pageId]; if (f) location.href = f; }
 function switchTab(tab){ const map={home:'index.html',search:'search.html',academic:'academic.html',ai:'ai.html',myAppointments:'my-appointments.html',profile:'profile.html'}; location.href = map[tab] || 'index.html'; }
 function goHome(){ location.href = 'index.html'; }
 function goBack(){ if (history.length > 1) history.back(); else location.href = 'index.html'; }
@@ -773,19 +766,12 @@ function goAppointmentForDrug() {
   location.href = 'appointment.html?drug=' + currentDrugId;
 }
 
-function goAppointmentWithMerchant() {
-  if (!isLoggedIn) { location.href = 'login.html?redirect=' + encodeURIComponent('appointment.html'); return; }
-  location.href = 'appointment.html';
-}
-
 function bookDrugAtMerchant(drugId, merchantId) {
   if (!isLoggedIn) { location.href = 'login.html?redirect=' + encodeURIComponent('appointment.html?drug=' + drugId + '&merchant=' + merchantId); return; }
   location.href = 'appointment.html?drug=' + drugId + '&merchant=' + merchantId;
 }
 
 function goMyAppointments() { location.href = 'my-appointments.html'; }
-
-function goMerchantLogin() { location.href = 'merchant-login.html'; }
 
 function goMerchantLogin() { location.href = 'merchant-login.html'; }
 
@@ -1384,7 +1370,6 @@ function recordMerchantFail(phone) {
 function resetMerchantFail() { setMerchantLock({ phone: '', failCount: 0, lockUntil: 0 }); }
 
 // ===== 导航 =====
-function goMerchantHome() { location.href = 'merchant.html'; }
 function goMerchantOrders() { location.href = 'merchant-orders.html'; }
 function goMerchantStats() { location.href = 'merchant-stats.html'; }
 function goMerchantProducts() { location.href = 'merchant-products.html'; }
@@ -2021,16 +2006,6 @@ function deleteAIConversation(id){
   renderAI();
   renderAIHistory();
 }
-function clearAllAIHistory(){
-  if(!aiConvs.length){ showToast('暂无历史对话'); return; }
-  if(!confirm('确定清空全部历史对话？')) return;
-  aiConvs = [];
-  aiCurrentId = null;
-  saveAIConvs();
-  renderAI();
-  renderAIHistory();
-}
-
 function renderAI(){
   // Suggestion list
   const sl = document.getElementById('aiSuggestList');

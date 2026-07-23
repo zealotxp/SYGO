@@ -1,5 +1,8 @@
 # 更新记录
 
+## [1.3.28] - 2026-07-23
+- 项目清理：删除废弃的前MPA构建链(app.raw.js/build.py/extract.py/test_runtime.js)、移除重复goMerchantLogin、删除4个无用函数(PAGE_FILE/showPage/goAppointmentWithMerchant/goMerchantHome/clearAllAIHistory)、清理14处死CSS(177行)
+
 ## [1.3.27] - 2026-07-23
 - 药品详情页副标题mock改为：服务流程：提交预约单—联系商家—预约取药
 
